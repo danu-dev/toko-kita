@@ -57,6 +57,31 @@
                             @endif
                         </a>
                     @endauth
+
+                    <!-- Share Store Button -->
+                    <div x-data="{
+                        copied: false,
+                        shareStore() {
+                            if (navigator.share) {
+                                navigator.share({
+                                    title: '{{ addslashes($store->name) }}',
+                                    text: 'Kunjungi toko UMKM {{ addslashes($store->name) }} di TokoKita!',
+                                    url: window.location.href
+                                }).catch(() => {});
+                            } else {
+                                navigator.clipboard.writeText(window.location.href);
+                                this.copied = true;
+                                setTimeout(() => this.copied = false, 2000);
+                            }
+                        }
+                    }">
+                        <button type="button" @click="shareStore()" class="p-2.5 rounded-2xl border border-gray-200 hover:bg-emerald-50 text-gray-500 hover:text-[#0E9F6E] transition relative" title="Bagikan Toko">
+                            <i data-lucide="share-2" class="w-4 h-4"></i>
+                            <span x-show="copied" x-cloak class="absolute -bottom-8 right-0 bg-[#1E2723] text-white text-[10px] py-1 px-2 rounded-md font-bold whitespace-nowrap shadow-md">
+                                Tautan Disalin!
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </div>
 

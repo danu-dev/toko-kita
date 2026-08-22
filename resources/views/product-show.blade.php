@@ -75,14 +75,41 @@
                             {{ $product->category->name ?? 'Produk Unggulan' }}
                         </span>
 
-                        @auth
-                            <form action="{{ route('wishlist.toggle', $product->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="p-2 rounded-full border border-gray-200 hover:bg-red-50 text-gray-400 hover:text-red-500 transition">
-                                    <i data-lucide="heart" class="w-5 h-5 {{ $isWishlisted ? 'fill-red-500 text-red-500' : '' }}"></i>
+                        <div class="flex items-center gap-2">
+                            <!-- Share Button with Web Share API & Fallback Copy -->
+                            <div x-data="{
+                                copied: false,
+                                shareProduct() {
+                                    if (navigator.share) {
+                                        navigator.share({
+                                            title: '{{ addslashes($product->name) }}',
+                                            text: 'Beli {{ addslashes($product->name) }} di {{ addslashes($product->store->name) }} lewat TokoKita!',
+                                            url: window.location.href
+                                        }).catch(() => {});
+                                    } else {
+                                        navigator.clipboard.writeText(window.location.href);
+                                        this.copied = true;
+                                        setTimeout(() => this.copied = false, 2000);
+                                    }
+                                }
+                            }">
+                                <button type="button" @click="shareProduct()" class="p-2 rounded-full border border-gray-200 hover:bg-emerald-50 text-gray-500 hover:text-[#0E9F6E] transition relative" title="Bagikan Produk">
+                                    <i data-lucide="share-2" class="w-5 h-5"></i>
+                                    <span x-show="copied" x-cloak class="absolute -bottom-8 right-0 bg-[#1E2723] text-white text-[10px] py-1 px-2 rounded-md font-bold whitespace-nowrap shadow-md">
+                                        Tautan Disalin!
+                                    </span>
                                 </button>
-                            </form>
-                        @endauth
+                            </div>
+
+                            @auth
+                                <form action="{{ route('wishlist.toggle', $product->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="p-2 rounded-full border border-gray-200 hover:bg-red-50 text-gray-400 hover:text-red-500 transition" title="Tambah ke Wishlist">
+                                        <i data-lucide="heart" class="w-5 h-5 {{ $isWishlisted ? 'fill-red-500 text-red-500' : '' }}"></i>
+                                    </button>
+                                </form>
+                            @endauth
+                        </div>
                     </div>
 
                     <h1 class="font-display font-black text-2xl sm:text-3xl text-[#1E2723] mt-2">
