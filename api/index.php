@@ -1,9 +1,8 @@
 <?php
 
-// Force plain error rendering for diagnosis
-ini_set('display_errors', '1');
-error_reporting(E_ALL);
+define('LARAVEL_START', microtime(true));
 
+// Auto-create /tmp subdirectories for serverless runtime
 $dirs = [
     '/tmp/framework/views',
     '/tmp/framework/sessions',
@@ -34,28 +33,22 @@ require __DIR__ . '/../vendor/autoload.php';
 /** @var \Illuminate\Foundation\Application $app */
 $app = require __DIR__ . '/../bootstrap/app.php';
 
-$app->useStoragePath('/tmp');
-$app->useBootstrapPath('/tmp');
+// Force serverless runtime bindings
+$app->booting(function () use ($app) {
+    $app['config']->set('app.env', 'production');
+    $app['config']->set('app.debug', false);
+    $app['config']->set('app.key', 'base64:fBH0BNGZVkziLbxJhRpDPTckE+RnaxiXZMUro63g4uY=');
+    $app['config']->set('session.driver', 'array');
+    $app['config']->set('cache.default', 'array');
+    $app['config']->set('logging.default', 'errorlog');
+    $app['config']->set('view.compiled', '/tmp/framework/views');
+    $app['config']->set('database.default', 'sqlite');
+    $app['config']->set('database.connections.sqlite.database', '/tmp/database.sqlite');
+});
 
-// Uncaught handler to output exact exception details
-try {
-    $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
-    $request = \Illuminate\Http\Request::capture();
-    $response = $kernel->handle($request);
+$kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
+$request = \Illuminate\Http\Request::capture();
 
-    if ($response->getStatusCode() === 500 && isset($response->exception) && $response->exception instanceof \Throwable) {
-        throw $response->exception;
-    }
-
-    $response->send();
-    $kernel->terminate($request, $response);
-} catch (\Throwable $e) {
-    header('HTTP/1.1 200 OK', true, 200);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "EXPLICIT SERVERLESS TRACE:\n";
-    echo "Class: " . get_class($e) . "\n";
-    echo "Message: " . $e->getMessage() . "\n";
-    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n\n";
-    echo "Trace:\n" . $e->getTraceAsString();
-    exit;
-}
+$response = $kernel->handle($request);
+$response->send();
+$kernel->terminate($request, $response);
