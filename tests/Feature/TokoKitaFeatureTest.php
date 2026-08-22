@@ -456,6 +456,29 @@ class TokoKitaFeatureTest extends TestCase
 
         $this->assertEquals(!$initialStatus, $store->fresh()->is_open);
     }
+
+    public function test_product_detail_page_displays_customer_reviews()
+    {
+        $product = Product::first();
+        $buyer = User::where('email', 'buyer@tokokita.id')->first();
+
+        \App\Models\Review::create([
+            'order_id' => Order::first()?->id ?? 1,
+            'buyer_id' => $buyer->id,
+            'store_id' => $product->store_id,
+            'product_id' => $product->id,
+            'rating' => 5,
+            'comment' => 'Makanannya enak sekali, porsi pas dan higienis!',
+            'seller_reply' => 'Terima kasih banyak atas pesanannya kak!',
+            'replied_at' => now(),
+        ]);
+
+        $response = $this->get(route('products.show', $product->slug));
+        $response->assertStatus(200);
+        $response->assertSee('Ulasan & Penilaian Pelanggan', false);
+        $response->assertSee('Makanannya enak sekali', false);
+        $response->assertSee('Terima kasih banyak atas pesanannya kak!', false);
+    }
 }
 
 

@@ -239,5 +239,87 @@
 
     </div>
 
+    <!-- Product Reviews / Rating Section -->
+    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="font-display font-black text-xl text-[#0B5A45]">Ulasan & Penilaian Pelanggan</h3>
+                <p class="text-xs text-gray-500">Ulasan autentik dari pembeli yang telah memesan produk ini.</p>
+            </div>
+            <div class="flex items-center gap-2 bg-[#FEF9EE] border border-[#F2A93B]/40 px-3.5 py-1.5 rounded-2xl text-xs font-bold text-amber-900">
+                <i data-lucide="star" class="w-4 h-4 text-[#F2A93B] fill-current"></i>
+                <span class="font-mono text-sm font-black">{{ number_format($product->rating, 1) }}</span>
+                <span class="text-gray-400 font-normal">/ 5.0</span>
+            </div>
+        </div>
+
+        @if($product->reviews->isEmpty())
+            <div class="p-8 text-center bg-[#FAF8F2] rounded-2xl border border-gray-100 text-gray-400 space-y-2">
+                <i data-lucide="message-square-off" class="w-8 h-8 mx-auto text-gray-300"></i>
+                <p class="text-xs font-medium">Belum ada ulasan untuk menu/produk ini. Jadilah orang pertama yang mengulas setelah pesanan selesai!</p>
+            </div>
+        @else
+            <div class="divide-y divide-gray-100">
+                @foreach($product->reviews as $rev)
+                    <div class="py-4 first:pt-0 last:pb-0 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#0B5A45] font-bold text-xs flex items-center justify-center">
+                                    {{ substr($rev->buyer?->name ?? 'User', 0, 1) }}
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-gray-800">{{ $rev->buyer?->name ?? 'Pembeli' }}</span>
+                                    <div class="flex items-center gap-1 text-[#F2A93B] text-[11px]">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i data-lucide="star" class="w-3 h-3 {{ $i <= $rev->rating ? 'fill-current' : 'text-gray-200' }}"></i>
+                                        @endfor
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-gray-400 font-mono">{{ $rev->created_at->translatedFormat('d M Y') }}</span>
+                        </div>
+
+                        <p class="text-xs text-gray-700 leading-relaxed pl-10">{{ $rev->comment }}</p>
+
+                        @if($rev->seller_reply)
+                            <div class="ml-10 p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 text-xs space-y-1">
+                                <span class="font-bold text-[#0E9F6E] flex items-center gap-1 text-[11px]">
+                                    <i data-lucide="corner-down-right" class="w-3 h-3"></i> Balasan Toko:
+                                </span>
+                                <p class="text-gray-600 pl-4">{{ $rev->seller_reply }}</p>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
+    <!-- Related Products Grid -->
+    @if($relatedProducts->isNotEmpty())
+        <div class="space-y-4 pt-2">
+            <h3 class="font-display font-bold text-lg text-[#0B5A45]">Menu Lainnya dari {{ $product->store->name }}</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                @foreach($relatedProducts as $rel)
+                    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-[#0E9F6E] hover:shadow-md transition flex flex-col group">
+                        <a href="{{ route('products.show', $rel->slug) }}" class="relative aspect-square w-full bg-gray-50 overflow-hidden block">
+                            <img src="{{ $rel->image ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80' }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        </a>
+                        <div class="p-3.5 flex-1 flex flex-col justify-between space-y-2">
+                            <div>
+                                <a href="{{ route('products.show', $rel->slug) }}" class="font-display font-bold text-xs text-[#1E2723] group-hover:text-[#0E9F6E] transition line-clamp-1">
+                                    {{ $rel->name }}
+                                </a>
+                                <p class="font-mono font-bold text-xs text-[#0B5A45] mt-1">
+                                    Rp {{ number_format($rel->price, 0, ',', '.') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
 </div>
 @endsection
