@@ -1,4 +1,4 @@
-<div class="h-[calc(100vh-140px)] flex flex-col md:flex-row bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden" wire:poll.3s>
+<div class="h-[calc(100vh-180px)] sm:h-[calc(100vh-140px)] flex flex-col md:flex-row bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden" wire:poll.3s>
     
     <!-- Left Chat List -->
     <div class="w-full md:w-80 border-r border-gray-100 flex flex-col h-full bg-[#FAF8F2]/60">
