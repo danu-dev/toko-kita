@@ -316,9 +316,10 @@
             <div>
                 <h4 class="font-display font-bold text-sm text-[#F2A93B] mb-3 uppercase tracking-wider">Layanan Pelanggan</h4>
                 <ul class="space-y-2 text-sm text-emerald-100/80">
-                    <li><a href="{{ route('orders.index') }}" class="hover:text-white">Lacak Pesanan</a></li>
-                    <li><a href="{{ route('chats.index') }}" class="hover:text-white">Pusat Pesan Chat</a></li>
-                    <li><a href="{{ route('profile') }}" class="hover:text-white">Pengaturan Akun & Alamat</a></li>
+                    <li><a href="{{ route('orders.index') }}" class="hover:text-white transition">Lacak Pesanan</a></li>
+                    <li><a href="{{ route('chats.index') }}" class="hover:text-white transition">Pusat Pesan Chat</a></li>
+                    <li><a href="{{ route('help') }}" class="hover:text-white transition">Pusat Bantuan & FAQ</a></li>
+                    <li><a href="{{ route('profile') }}" class="hover:text-white transition">Pengaturan Akun & Alamat</a></li>
                 </ul>
             </div>
             <div>

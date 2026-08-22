@@ -573,6 +573,15 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertSee('Peringatan: Stok Menu / Produk Menipis', false);
         $response->assertSee('Sisa 2');
     }
+
+    public function test_help_center_faq_page_loads_successfully()
+    {
+        $response = $this->get(route('help'));
+        $response->assertStatus(200);
+        $response->assertSee('Pusat Bantuan & Panduan', false);
+        $response->assertSee('Pertanyaan Sering Ditanyakan (FAQ)', false);
+        $response->assertSee('Rekening Bersama', false);
+    }
 }
 
 

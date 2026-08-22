@@ -178,4 +178,32 @@ class HomeController extends Controller
 
         return view('product-show', compact('product', 'relatedProducts', 'isWishlisted'));
     }
+
+    public function helpCenter()
+    {
+        $faqs = [
+            [
+                'q' => 'Bagaimana cara memesan makanan/produk di TokoKita?',
+                'a' => 'Cari produk atau warung terdekat melalui halaman Beranda atau Jelajah. Pilih menu, varian, dan porsi yang diinginkan, masukkan ke keranjang, lalu klik Checkout untuk memilih metode Ambil Sendiri (Pickup) atau Pesan Antar Kurir Lokal.'
+            ],
+            [
+                'q' => 'Apakah sistem pembayaran di TokoKita aman?',
+                'a' => 'Sangat aman. TokoKita menggunakan sistem Escrow (Rekening Bersama). Dana pembayaran Anda ditampung sementara dan baru diteruskan ke saldo toko penjual setelah pesanan selesai diterima dengan baik.'
+            ],
+            [
+                'q' => 'Bagaimana jika pesanan saya tidak sesuai atau bermasalah?',
+                'a' => 'Anda dapat mengajukan Komplain / Pengembalian (Dispute) dari detail pesanan. Tim Admin TokoKita akan memediasi dan memproses pengembalian dana (refund) jika komplain terbukti sah.'
+            ],
+            [
+                'q' => 'Bagaimana cara mendaftar menjadi Mitra Penjual UMKM?',
+                'a' => 'Klik menu "Buka Warung / Toko" atau tombol "Gabung Jadi Mitra UMKM", lengkapi profil toko Anda, alamat peta, jam operasional, dan unggah foto menu. Toko Anda akan segera aktif melayani pembeli di sekitar wilayah Anda.'
+            ],
+            [
+                'q' => 'Berapa biaya komisi platform untuk Mitra Penjual?',
+                'a' => 'TokoKita menerapkan biaya komisi platform sangat rendah hanya 5% dari total penjualan, memastikan keuntungan maksimal bagi kemajuan pelaku UMKM lokal.'
+            ]
+        ];
+
+        return view('help-center', compact('faqs'));
+    }
 }

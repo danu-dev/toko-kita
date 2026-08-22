@@ -19,6 +19,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/jelajah', [HomeController::class, 'explore'])->name('explore');
 Route::get('/toko/{slug}', [HomeController::class, 'storeShow'])->name('stores.show');
 Route::get('/produk/{slug}', [HomeController::class, 'productShow'])->name('products.show');
+Route::get('/pusat-bantuan', [HomeController::class, 'helpCenter'])->name('help');
 
 // Authentication & Quick Role Switcher
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
