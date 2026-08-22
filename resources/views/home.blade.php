@@ -91,6 +91,95 @@
         </div>
     </section>
 
+    <!-- 3.5. Flash Sale / Promo Kilat UMKM (Live Countdown Timer) -->
+    @if($discountProducts->isNotEmpty())
+        <section class="bg-gradient-to-r from-[#0B5A45] to-[#086644] p-5 sm:p-7 rounded-3xl text-white space-y-4 shadow-lg relative overflow-hidden" x-data="{
+            expiry: new Date().setHours(23, 59, 59, 999),
+            hours: '00',
+            minutes: '00',
+            seconds: '00',
+            updateTimer() {
+                const now = new Date().getTime();
+                const diff = this.expiry - now;
+                if (diff <= 0) {
+                    this.hours = '00';
+                    this.minutes = '00';
+                    this.seconds = '00';
+                    return;
+                }
+                this.hours = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+                this.minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                this.seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+            }
+        }" x-init="updateTimer(); setInterval(() => updateTimer(), 1000)">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-[#F2A93B] text-[#1E2723] flex items-center justify-center font-black">
+                        <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="font-display font-black text-xl text-white">Promo Kilat UMKM 🔥</h2>
+                            <span class="bg-[#F2A93B] text-[#1E2723] text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Spesial Hari Ini</span>
+                        </div>
+                        <p class="text-xs text-emerald-100/80">Penawaran diskon spesial langsung dari mitra UMKM lokal sekitar Anda.</p>
+                    </div>
+                </div>
+
+                <!-- Live Timer Countdown -->
+                <div class="flex items-center gap-1.5 self-start sm:self-auto bg-black/30 backdrop-blur px-3.5 py-1.5 rounded-2xl border border-white/10">
+                    <span class="text-xs text-emerald-200 font-semibold mr-1">Berakhir Dalam:</span>
+                    <span class="font-mono font-black text-sm bg-white text-[#0B5A45] px-2 py-0.5 rounded-lg" x-text="hours">00</span>
+                    <span class="font-bold text-white">:</span>
+                    <span class="font-mono font-black text-sm bg-white text-[#0B5A45] px-2 py-0.5 rounded-lg" x-text="minutes">00</span>
+                    <span class="font-bold text-white">:</span>
+                    <span class="font-mono font-black text-sm bg-[#F2A93B] text-[#1E2723] px-2 py-0.5 rounded-lg" x-text="seconds">00</span>
+                </div>
+            </div>
+
+            <!-- Discount Products Carousel / Horizontal Scroll -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 pt-2 relative z-10">
+                @foreach($discountProducts as $discProd)
+                    @php
+                        $discPercentage = round((($discProd->compare_at_price - $discProd->price) / $discProd->compare_at_price) * 100);
+                    @endphp
+                    <div class="bg-white rounded-2xl p-2.5 text-[#1E2723] flex flex-col justify-between hover:shadow-md transition group">
+                        <a href="{{ route('products.show', $discProd->slug) }}" class="relative aspect-square w-full rounded-xl overflow-hidden bg-gray-50 block mb-2">
+                            <img src="{{ $discProd->image ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80' }}" class="w-full h-full object-cover group-hover:scale-105 transition">
+                            <span class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded shadow-sm">
+                                -{{ $discPercentage }}%
+                            </span>
+                        </a>
+
+                        <div class="space-y-1">
+                            <a href="{{ route('products.show', $discProd->slug) }}" class="font-display font-bold text-xs line-clamp-1 group-hover:text-[#0E9F6E] transition">
+                                {{ $discProd->name }}
+                            </a>
+                            <div class="flex flex-col">
+                                <span class="font-mono font-black text-sm text-[#0B5A45]">
+                                    Rp {{ number_format($discProd->price, 0, ',', '.') }}
+                                </span>
+                                <span class="text-[10px] text-gray-400 line-through font-mono">
+                                    Rp {{ number_format($discProd->compare_at_price, 0, ',', '.') }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <form action="{{ route('cart.add') }}" method="POST" class="mt-2">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $discProd->id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="w-full bg-[#EDFDF5] hover:bg-[#0E9F6E] text-[#0E9F6E] hover:text-white text-[11px] font-bold py-1.5 rounded-xl transition flex items-center justify-center gap-1">
+                                <i data-lucide="plus" class="w-3 h-3"></i>
+                                <span>Beli</span>
+                            </button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
     <!-- 4. Featured Stores with Dynamic Calculated Distance -->
     <section class="space-y-4">
         <div class="flex items-center justify-between">
