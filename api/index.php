@@ -1,18 +1,32 @@
 <?php
 
-// Direct serverless bootstrap
-$_ENV['APP_CONFIG_CACHE'] = '/tmp/config.php';
-$_ENV['APP_EVENTS_CACHE'] = '/tmp/events.php';
+putenv('VIEW_COMPILED_PATH=/tmp/framework/views');
+putenv('APP_ENV=production');
+putenv('APP_DEBUG=false');
+putenv('LOG_CHANNEL=stderr');
+putenv('SESSION_DRIVER=cookie');
+putenv('CACHE_STORE=array');
+putenv('DB_CONNECTION=sqlite');
+putenv('DB_DATABASE=/tmp/database.sqlite');
+putenv('APP_PACKAGES_CACHE=/tmp/packages.php');
+putenv('APP_SERVICES_CACHE=/tmp/services.php');
+
+$_ENV['VIEW_COMPILED_PATH'] = '/tmp/framework/views';
+$_ENV['APP_ENV'] = 'production';
+$_ENV['APP_DEBUG'] = 'false';
+$_ENV['LOG_CHANNEL'] = 'stderr';
+$_ENV['SESSION_DRIVER'] = 'cookie';
+$_ENV['CACHE_STORE'] = 'array';
+$_ENV['DB_CONNECTION'] = 'sqlite';
+$_ENV['DB_DATABASE'] = '/tmp/database.sqlite';
 $_ENV['APP_PACKAGES_CACHE'] = '/tmp/packages.php';
-$_ENV['APP_ROUTES_CACHE'] = '/tmp/routes.php';
 $_ENV['APP_SERVICES_CACHE'] = '/tmp/services.php';
-$_ENV['VIEW_COMPILED_PATH'] = '/tmp/views';
 
 $dirs = [
-    '/tmp/views',
-    '/tmp/framework/sessions',
     '/tmp/framework/views',
+    '/tmp/framework/sessions',
     '/tmp/framework/cache',
+    '/tmp/views',
     '/tmp/cache',
     '/tmp/logs'
 ];
@@ -22,8 +36,8 @@ foreach ($dirs as $dir) {
     }
 }
 
-// Copy pre-compiled bootstrap cache files to /tmp so Laravel doesn't write to read-only disk
-$cachedFiles = ['packages.php', 'services.php', 'config.php', 'routes-v7.php'];
+// Copy pre-built package and service caches
+$cachedFiles = ['packages.php', 'services.php'];
 foreach ($cachedFiles as $file) {
     $src = __DIR__ . '/../bootstrap/cache/' . $file;
     if (file_exists($src)) {
@@ -46,5 +60,8 @@ if (!file_exists($targetDb)) {
 require __DIR__ . '/../vendor/autoload.php';
 
 $app = require __DIR__ . '/../bootstrap/app.php';
+
+$app->useStoragePath('/tmp');
+$app->useBootstrapPath('/tmp');
 
 $app->handleRequest(\Illuminate\Http\Request::capture());
