@@ -1,27 +1,16 @@
 <?php
 
-putenv('APP_ENV=production');
-putenv('APP_DEBUG=true');
-putenv('LOG_CHANNEL=stderr');
-putenv('VIEW_COMPILED_PATH=/tmp/views');
-putenv('DB_CONNECTION=sqlite');
-putenv('DB_DATABASE=/tmp/database.sqlite');
-putenv('SESSION_DRIVER=cookie');
-putenv('CACHE_STORE=array');
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\Request;
 
-$_ENV['APP_ENV'] = 'production';
-$_ENV['APP_DEBUG'] = 'true';
-$_ENV['LOG_CHANNEL'] = 'stderr';
-$_ENV['VIEW_COMPILED_PATH'] = '/tmp/views';
-$_ENV['DB_CONNECTION'] = 'sqlite';
-$_ENV['DB_DATABASE'] = '/tmp/database.sqlite';
-$_ENV['SESSION_DRIVER'] = 'cookie';
-$_ENV['CACHE_STORE'] = 'array';
+define('LARAVEL_START', microtime(true));
 
+// Ensure tmp directories exist
 if (!is_dir('/tmp/views')) {
     @mkdir('/tmp/views', 0755, true);
 }
 
+// Copy seed database to /tmp if it doesn't exist
 $sourceDb = __DIR__ . '/../database/database.sqlite';
 $targetDb = '/tmp/database.sqlite';
 
@@ -33,4 +22,21 @@ if (!file_exists($targetDb)) {
     }
 }
 
-require __DIR__ . '/../public/index.php';
+// Clean any leftover hot file
+if (file_exists(__DIR__ . '/../public/hot')) {
+    @unlink(__DIR__ . '/../public/hot');
+}
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+
+$kernel = $app->make(Kernel::class);
+
+$response = $kernel->handle(
+    $request = Request::capture()
+);
+
+$response->send();
+
+$kernel->terminate($request, $response);
