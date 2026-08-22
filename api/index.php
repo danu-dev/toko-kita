@@ -1,6 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
+// Force plain error rendering for diagnosis
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
 
 $dirs = [
     '/tmp/framework/views',
@@ -35,11 +37,16 @@ $app = require __DIR__ . '/../bootstrap/app.php';
 $app->useStoragePath('/tmp');
 $app->useBootstrapPath('/tmp');
 
-// Capture and execute with uncaught handler
+// Uncaught handler to output exact exception details
 try {
     $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
-    $request = Request::capture();
+    $request = \Illuminate\Http\Request::capture();
     $response = $kernel->handle($request);
+
+    if ($response->getStatusCode() === 500 && isset($response->exception) && $response->exception instanceof \Throwable) {
+        throw $response->exception;
+    }
+
     $response->send();
     $kernel->terminate($request, $response);
 } catch (\Throwable $e) {
