@@ -604,6 +604,16 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee(route('chats.start'), false);
     }
+
+    public function test_seller_can_export_sales_reports_csv()
+    {
+        $seller = User::where('email', 'seller@tokokita.id')->first();
+        $this->actingAs($seller);
+
+        $response = $this->get(route('seller.reports.export-csv'));
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+    }
 }
 
 
