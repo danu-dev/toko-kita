@@ -1,35 +1,30 @@
 <?php
 
-use Illuminate\Http\Request;
+define('LARAVEL_START', microtime(true));
 
-// Force serverless env variables
+// Setup environment and paths for Vercel Serverless execution
 putenv('APP_ENV=production');
-putenv('APP_DEBUG=false');
+putenv('APP_DEBUG=true');
 putenv('LOG_CHANNEL=stderr');
 putenv('VIEW_COMPILED_PATH=/tmp/framework/views');
 putenv('SESSION_DRIVER=cookie');
 putenv('CACHE_STORE=array');
 putenv('DB_CONNECTION=sqlite');
 putenv('DB_DATABASE=/tmp/database.sqlite');
-putenv('APP_PACKAGES_CACHE=/tmp/packages.php');
-putenv('APP_SERVICES_CACHE=/tmp/services.php');
 putenv('APP_CONFIG_CACHE=/tmp/config.php');
-putenv('APP_ROUTES_CACHE=/tmp/routes.php');
 putenv('APP_EVENTS_CACHE=/tmp/events.php');
+putenv('APP_PACKAGES_CACHE=/tmp/packages.php');
+putenv('APP_ROUTES_CACHE=/tmp/routes.php');
+putenv('APP_SERVICES_CACHE=/tmp/services.php');
 
-$_ENV['APP_ENV'] = 'production';
-$_ENV['APP_DEBUG'] = 'false';
-$_ENV['LOG_CHANNEL'] = 'stderr';
 $_ENV['VIEW_COMPILED_PATH'] = '/tmp/framework/views';
+$_ENV['APP_ENV'] = 'production';
+$_ENV['APP_DEBUG'] = 'true';
+$_ENV['LOG_CHANNEL'] = 'stderr';
 $_ENV['SESSION_DRIVER'] = 'cookie';
 $_ENV['CACHE_STORE'] = 'array';
 $_ENV['DB_CONNECTION'] = 'sqlite';
 $_ENV['DB_DATABASE'] = '/tmp/database.sqlite';
-$_ENV['APP_PACKAGES_CACHE'] = '/tmp/packages.php';
-$_ENV['APP_SERVICES_CACHE'] = '/tmp/services.php';
-$_ENV['APP_CONFIG_CACHE'] = '/tmp/config.php';
-$_ENV['APP_ROUTES_CACHE'] = '/tmp/routes.php';
-$_ENV['APP_EVENTS_CACHE'] = '/tmp/events.php';
 
 $dirs = [
     '/tmp/framework/views',
@@ -45,19 +40,9 @@ foreach ($dirs as $dir) {
     }
 }
 
-// Copy pre-built package and service caches
-$cachedFiles = ['packages.php', 'services.php'];
-foreach ($cachedFiles as $file) {
-    $src = __DIR__ . '/../bootstrap/cache/' . $file;
-    if (file_exists($src)) {
-        @copy($src, '/tmp/' . $file);
-    }
-}
-
 // Copy sqlite database to /tmp
 $sourceDb = __DIR__ . '/../database/database.sqlite';
 $targetDb = '/tmp/database.sqlite';
-
 if (!file_exists($targetDb)) {
     if (file_exists($sourceDb)) {
         @copy($sourceDb, $targetDb);
@@ -68,10 +53,25 @@ if (!file_exists($targetDb)) {
 
 require __DIR__ . '/../vendor/autoload.php';
 
+/** @var \Illuminate\Foundation\Application $app */
 $app = require __DIR__ . '/../bootstrap/app.php';
 
 $app->useStoragePath('/tmp');
 $app->useBootstrapPath('/tmp');
 
-// Clean handle
-$app->handleRequest(Request::capture());
+// Capture and execute
+$kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
+$request = \Illuminate\Http\Request::capture();
+
+try {
+    $response = $kernel->handle($request);
+    $response->send();
+    $kernel->terminate($request, $response);
+} catch (\Throwable $e) {
+    header('Content-Type: text/plain; charset=utf-8', true, 500);
+    echo "SERVERLESS CRITICAL EXCEPTION:\n";
+    echo "Class: " . get_class($e) . "\n";
+    echo "Message: " . $e->getMessage() . "\n";
+    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n\n";
+    echo "Trace:\n" . $e->getTraceAsString();
+}
