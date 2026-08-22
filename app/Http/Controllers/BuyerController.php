@@ -13,6 +13,7 @@ use App\Models\Store;
 use App\Models\Wishlist;
 use App\Models\Review;
 use App\Models\Dispute;
+use App\Models\Coupon;
 use App\Models\User;
 use App\Services\CommissionService;
 use App\Services\OrderService;
@@ -173,7 +174,12 @@ class BuyerController extends Controller
         $serviceFee = 1000;
         $total = $subtotal + $deliveryFee + $serviceFee;
 
-        return view('buyer.checkout', compact('store', 'items', 'subtotal', 'addresses', 'defaultAddress', 'deliveryFee', 'serviceFee', 'total', 'user'));
+        // Available Coupons
+        $activeCoupons = Coupon::where('is_active', true)
+            ->where(fn($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
+            ->get();
+
+        return view('buyer.checkout', compact('store', 'items', 'subtotal', 'addresses', 'defaultAddress', 'deliveryFee', 'serviceFee', 'total', 'user', 'activeCoupons'));
     }
 
     public function processCheckout(Request $request, int $storeId)
@@ -183,6 +189,7 @@ class BuyerController extends Controller
             'address_id' => 'required_if:fulfillment_type,delivery|nullable|exists:addresses,id',
             'payment_method' => 'required|in:qris,gopay,ovo,dana,bca_va,mandiri_va,cod',
             'use_points' => 'nullable',
+            'coupon_code' => 'nullable|string',
             'buyer_notes' => 'nullable|string|max:500',
         ]);
 
@@ -214,21 +221,31 @@ class BuyerController extends Controller
         $deliveryFee = ($validated['fulfillment_type'] === 'delivery') ? 8000 : 0;
         $serviceFee = 1000;
         
-        // Point deduction logic (1 point = Rp 1 discount)
-        $discountAmount = 0;
+        // 1. Coupon Discount Calculation
+        $couponDiscount = 0;
+        if (!empty($validated['coupon_code'])) {
+            $coupon = Coupon::where('code', strtoupper($validated['coupon_code']))->first();
+            if ($coupon) {
+                $couponDiscount = $coupon->calculateDiscount($subtotal);
+            }
+        }
+
+        // 2. Point deduction logic (1 point = Rp 1 discount)
+        $pointDiscount = 0;
         $pointsToDeduct = 0;
         $usePointsRequested = $request->filled('use_points') && in_array((string)$request->input('use_points'), ['1', 'true', 'on']);
         
+        $grossRemaining = max(0, ($subtotal + $deliveryFee + $serviceFee) - $couponDiscount);
         if ($usePointsRequested && $user->loyalty_points > 0) {
-            $grossAmount = $subtotal + $deliveryFee + $serviceFee;
-            $maxDiscount = max(0, $grossAmount - 1000); // minimum order Rp 1.000
-            $discountAmount = min((float)$user->loyalty_points, (float)$maxDiscount);
-            $pointsToDeduct = (int) $discountAmount;
+            $maxPointDiscount = max(0, $grossRemaining - 1000);
+            $pointDiscount = min((float)$user->loyalty_points, (float)$maxPointDiscount);
+            $pointsToDeduct = (int) $pointDiscount;
         }
 
+        $totalDiscount = $couponDiscount + $pointDiscount;
         $commissionFee = $this->commissionService->calculate($subtotal);
         $sellerEarnings = $this->commissionService->calculateSellerEarnings($subtotal);
-        $total = max(1000, ($subtotal + $deliveryFee + $serviceFee) - $discountAmount);
+        $total = max(1000, ($subtotal + $deliveryFee + $serviceFee) - $totalDiscount);
 
         DB::beginTransaction();
         try {
@@ -243,7 +260,7 @@ class BuyerController extends Controller
                 'subtotal' => $subtotal,
                 'delivery_fee' => $deliveryFee,
                 'service_fee' => $serviceFee,
-                'discount_amount' => $discountAmount,
+                'discount_amount' => $totalDiscount,
                 'commission_fee' => $commissionFee,
                 'seller_earnings' => $sellerEarnings,
                 'total' => $total,
@@ -266,7 +283,7 @@ class BuyerController extends Controller
                 $item->product->decrement('stock', $item->quantity);
             }
 
-            // Deduct loyalty points from user
+            // Deduct loyalty points
             if ($pointsToDeduct > 0) {
                 $user->decrement('loyalty_points', $pointsToDeduct);
             }
@@ -277,7 +294,7 @@ class BuyerController extends Controller
                 'from_status' => null,
                 'to_status' => 'menunggu_konfirmasi',
                 'changed_by' => $user->id,
-                'notes' => 'Pesanan berhasil dibuat dan menunggu respon penjual.' . ($discountAmount > 0 ? " (Menggunakan {$discountAmount} poin diskon)" : ''),
+                'notes' => 'Pesanan berhasil dibuat.' . ($totalDiscount > 0 ? " (Diskon Rp " . number_format($totalDiscount, 0, ',', '.') . ")" : ''),
             ]);
 
             CartItem::whereIn('id', $items->pluck('id'))->delete();

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Checkout Pesanan — Toko Kita')
+@section('title', 'Checkout Pesanan — TokoKita.')
 
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6" x-data="{
@@ -9,16 +9,24 @@
     serviceFee: 1000,
     subtotal: {{ $subtotal }},
     selectedPaymentCategory: 'gateway',
+    couponCode: '',
+    couponDiscount: 0,
     usePoints: false,
     userPoints: {{ Auth::user()->loyalty_points ?? 0 }},
-    get discountAmount() {
+    applyCoupon(code, discount) {
+        this.couponCode = code;
+        this.couponDiscount = discount;
+    },
+    get pointDiscountAmount() {
         if (!this.usePoints || this.userPoints <= 0) return 0;
-        let maxDiscount = this.subtotal + (this.fulfillmentType === 'delivery' ? this.deliveryFee : 0) + this.serviceFee - 1000;
-        return Math.min(this.userPoints, Math.max(0, maxDiscount));
+        let grossAfterCoupon = Math.max(0, this.subtotal + (this.fulfillmentType === 'delivery' ? this.deliveryFee : 0) + this.serviceFee - this.couponDiscount);
+        let maxPointDiscount = Math.max(0, grossAfterCoupon - 1000);
+        return Math.min(this.userPoints, maxPointDiscount);
     },
     get total() {
         let gross = this.subtotal + (this.fulfillmentType === 'delivery' ? this.deliveryFee : 0) + this.serviceFee;
-        return Math.max(1000, gross - this.discountAmount);
+        let totalDiscount = this.couponDiscount + this.pointDiscountAmount;
+        return Math.max(1000, gross - totalDiscount);
     }
 }">
 
@@ -136,10 +144,39 @@
 
         </div>
 
-        <!-- Right Column: Loyalty Points, Payment Methods & Summary -->
+        <!-- Right Column: Coupons, Loyalty Points, Payment Methods & Summary -->
         <div class="lg:col-span-5 space-y-5">
             
-            <!-- Loyalty Points Redeem Card -->
+            <!-- 1. Voucher & Promo Code Section -->
+            <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="ticket" class="w-4 h-4 text-[#0E9F6E]"></i>
+                        <h3 class="font-display font-bold text-sm text-[#0B5A45]">Voucher & Kupon Promo</h3>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" name="coupon_code" x-model="couponCode" placeholder="Masukkan kode voucher (misal: UMKMHEMAT)" class="flex-1 px-3.5 py-2 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs uppercase font-mono font-bold focus:border-[#0E9F6E] focus:outline-none">
+                    <button type="button" @click="if(couponCode.toUpperCase() === 'UMKMHEMAT') { couponDiscount = Math.min(10000, subtotal * 0.2); } else if(couponCode.toUpperCase() === 'ONGKIRGRATIS') { couponDiscount = 8000; } else { couponDiscount = 0; alert('Kode promo tidak valid atau sudah kadaluarsa.'); }" class="bg-[#0B5A45] hover:bg-[#086644] text-white px-4 py-2 rounded-xl text-xs font-bold transition">
+                        Gunakan
+                    </button>
+                </div>
+
+                <!-- Quick Promo Pill Presets -->
+                <div class="flex flex-wrap gap-1.5 pt-1">
+                    <button type="button" @click="applyCoupon('UMKMHEMAT', Math.min(10000, subtotal * 0.2))" class="bg-emerald-50 text-[#0E9F6E] hover:bg-emerald-100 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-emerald-200 transition flex items-center gap-1">
+                        <i data-lucide="sparkles" class="w-3 h-3"></i>
+                        <span>UMKMHEMAT (Diskon 20%)</span>
+                    </button>
+                    <button type="button" @click="applyCoupon('ONGKIRGRATIS', 8000)" class="bg-amber-50 text-amber-800 hover:bg-amber-100 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-amber-200 transition flex items-center gap-1">
+                        <i data-lucide="tag" class="w-3 h-3"></i>
+                        <span>ONGKIRGRATIS (Rp 8.000)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. Loyalty Points Redeem Card -->
             @auth
                 @if(Auth::user()->loyalty_points > 0)
                     <div class="bg-[#FEF9EE] p-5 rounded-3xl border border-[#F2A93B]/40 shadow-sm space-y-3">
@@ -156,7 +193,7 @@
                                 <input type="checkbox" name="use_points" value="1" x-model="usePoints" class="rounded text-[#F2A93B] focus:ring-[#F2A93B]">
                                 <span class="text-xs font-semibold text-gray-800">Gunakan Poin untuk Diskon Belanja</span>
                             </div>
-                            <span class="font-mono text-xs font-bold text-[#0E9F6E]" x-text="'-Rp ' + discountAmount.toLocaleString('id-ID')"></span>
+                            <span class="font-mono text-xs font-bold text-[#0E9F6E]" x-text="'-Rp ' + pointDiscountAmount.toLocaleString('id-ID')"></span>
                         </label>
                         <p class="text-[10px] text-amber-800/80">1 Poin bernilai potongan Rp 1 langsung dari total belanja Anda.</p>
                     </div>
@@ -259,9 +296,14 @@
                         <span class="font-mono font-bold">Rp 1.000</span>
                     </div>
 
-                    <div x-show="discountAmount > 0" class="flex justify-between text-[#0E9F6E] font-bold">
+                    <div x-show="couponDiscount > 0" class="flex justify-between text-[#0E9F6E] font-bold">
+                        <span>Diskon Kupon Promo</span>
+                        <span class="font-mono" x-text="'-Rp ' + couponDiscount.toLocaleString('id-ID')"></span>
+                    </div>
+
+                    <div x-show="pointDiscountAmount > 0" class="flex justify-between text-[#0E9F6E] font-bold">
                         <span>Diskon Tukar Poin</span>
-                        <span class="font-mono" x-text="'-Rp ' + discountAmount.toLocaleString('id-ID')"></span>
+                        <span class="font-mono" x-text="'-Rp ' + pointDiscountAmount.toLocaleString('id-ID')"></span>
                     </div>
 
                     <div class="pt-3 border-t border-gray-100 flex justify-between items-baseline">
@@ -276,7 +318,7 @@
                 </button>
 
                 <p class="text-[10px] text-center text-gray-400 mt-2">
-                    🛡️ Pembayaran diamankan dengan sistem escrow garansi Toko Kita.
+                    🛡️ Pembayaran diamankan dengan sistem escrow garansi TokoKita.
                 </p>
             </div>
 

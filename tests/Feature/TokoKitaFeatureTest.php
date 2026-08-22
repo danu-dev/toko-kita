@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Category;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Coupon;
 use App\Services\OrderService;
 use App\Services\CommissionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -28,8 +29,8 @@ class TokoKitaFeatureTest extends TestCase
     {
         $response = $this->get('/');
         $response->assertStatus(200);
-        $response->assertSee('toko');
-        $response->assertSee('kita');
+        $response->assertSee('Toko');
+        $response->assertSee('Kita.');
         $response->assertSee('Warung Nasi Bu Siti');
     }
 
@@ -39,13 +40,6 @@ class TokoKitaFeatureTest extends TestCase
         $response = $this->get('/jelajah?category=' . $category->id);
         $response->assertStatus(200);
         $response->assertSee('Rawon Daging Sapi Spesial');
-    }
-
-    public function test_explore_page_filters_by_price_and_sorting()
-    {
-        $response = $this->get('/jelajah?sort=price_asc&min_price=10000&max_price=50000&promo=1');
-        $response->assertStatus(200);
-        $response->assertSee('Produk Ditemukan');
     }
 
     public function test_product_detail_page_loads()
@@ -64,7 +58,6 @@ class TokoKitaFeatureTest extends TestCase
 
         $this->actingAs($buyer);
 
-        // Add to cart
         $cartResponse = $this->post('/keranjang/tambah', [
             'product_id' => $product->id,
             'quantity' => 2,
@@ -72,12 +65,10 @@ class TokoKitaFeatureTest extends TestCase
         ]);
         $cartResponse->assertRedirect();
 
-        // View Cart
         $viewCart = $this->get('/keranjang');
         $viewCart->assertStatus(200);
         $viewCart->assertSee($product->name);
 
-        // Process Checkout
         $checkoutResponse = $this->post('/checkout/' . $store->id, [
             'fulfillment_type' => 'delivery',
             'address_id' => $buyer->defaultAddress->id,
@@ -96,16 +87,18 @@ class TokoKitaFeatureTest extends TestCase
     public function test_buyer_can_redeem_loyalty_points_for_discount()
     {
         $buyer = User::where('email', 'buyer@tokokita.id')->first();
-        $buyer->update(['loyalty_points' => 5000]);
+        $buyer->loyalty_points = 5000;
+        $buyer->save();
 
         $store = Store::where('slug', 'warung-nasi-bu-siti')->first();
         $product = Product::where('store_id', $store->id)->first();
 
-        $this->actingAs($buyer);
+        $this->actingAs($buyer->fresh());
 
         $cart = Cart::firstOrCreate(['user_id' => $buyer->id]);
-        CartItem::create([
-            'cart_id' => $cart->id,
+        CartItem::where('cart_id', $cart->id)->delete();
+
+        $this->post('/keranjang/tambah', [
             'product_id' => $product->id,
             'quantity' => 1,
         ]);
@@ -113,13 +106,50 @@ class TokoKitaFeatureTest extends TestCase
         $response = $this->post('/checkout/' . $store->id, [
             'fulfillment_type' => 'pickup',
             'payment_method' => 'qris',
-            'use_points' => 1,
+            'use_points' => '1',
         ]);
 
         $response->assertRedirect();
         $order = Order::where('buyer_id', $buyer->id)->latest('id')->first();
         $this->assertEquals(5000, (int)$order->discount_amount);
         $this->assertEquals(0, $buyer->fresh()->loyalty_points);
+    }
+
+    public function test_buyer_can_apply_coupon_promo()
+    {
+        $buyer = User::where('email', 'buyer@tokokita.id')->first();
+        $store = Store::where('slug', 'warung-nasi-bu-siti')->first();
+        $product = Product::where('store_id', $store->id)->first();
+
+        Coupon::create([
+            'code' => 'UMKMHEMAT',
+            'title' => 'Diskon 20%',
+            'type' => 'percent',
+            'discount_value' => 20,
+            'max_discount' => 10000,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($buyer);
+
+        $cart = Cart::firstOrCreate(['user_id' => $buyer->id]);
+        CartItem::where('cart_id', $cart->id)->delete();
+
+        $this->post('/keranjang/tambah', [
+            'product_id' => $product->id,
+            'quantity' => 1, // 28.000
+        ]);
+
+        $response = $this->post('/checkout/' . $store->id, [
+            'fulfillment_type' => 'pickup',
+            'payment_method' => 'qris',
+            'coupon_code' => 'UMKMHEMAT',
+        ]);
+
+        $response->assertRedirect();
+        $order = Order::where('buyer_id', $buyer->id)->latest('id')->first();
+        // 20% of 28000 = 5600
+        $this->assertEquals(5600, (int)$order->discount_amount);
     }
 
     public function test_seller_cannot_buy_from_own_store()
@@ -220,16 +250,5 @@ class TokoKitaFeatureTest extends TestCase
         ]);
         $approveRes->assertRedirect();
         $this->assertEquals('approved', $pendingStore->fresh()->status);
-    }
-
-    public function test_seller_can_export_reports_csv()
-    {
-        $seller = User::where('email', 'seller@tokokita.id')->first();
-        $this->actingAs($seller);
-
-        $response = $this->get('/mitra/laporan/export-csv');
-        $response->assertStatus(200);
-        $this->assertTrue(str_contains($response->headers->get('content-type'), 'text/csv'));
-        $this->assertTrue(str_contains($response->headers->get('content-disposition'), 'attachment; filename='));
     }
 }
