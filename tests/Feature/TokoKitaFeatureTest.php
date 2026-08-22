@@ -592,6 +592,18 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Rekomendasi Menu Favorit Tetangga', false);
     }
+
+    public function test_product_detail_page_has_chat_seller_action()
+    {
+        $buyer = User::where('email', 'buyer@tokokita.id')->first();
+        $this->actingAs($buyer);
+
+        $product = Product::first();
+        $response = $this->get(route('products.show', $product->slug));
+        
+        $response->assertStatus(200);
+        $response->assertSee(route('chats.start'), false);
+    }
 }
 
 

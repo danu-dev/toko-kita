@@ -76,6 +76,23 @@
                         </span>
 
                         <div class="flex items-center gap-2">
+                            <!-- Direct Chat Button to Seller from Product Page -->
+                            @auth
+                                @if(!Auth::user()->store || Auth::user()->store->id !== $product->store_id)
+                                    <form action="{{ route('chats.start') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="store_id" value="{{ $product->store_id }}">
+                                        <button type="submit" class="p-2 rounded-full border border-gray-200 hover:bg-emerald-50 text-gray-500 hover:text-[#0E9F6E] transition" title="Tanya Penjual / Chat Toko">
+                                            <i data-lucide="message-square" class="w-5 h-5"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            @else
+                                <a href="{{ route('login') }}" class="p-2 rounded-full border border-gray-200 hover:bg-emerald-50 text-gray-500 hover:text-[#0E9F6E] transition" title="Login untuk Chat Penjual">
+                                    <i data-lucide="message-square" class="w-5 h-5"></i>
+                                </a>
+                            @endauth
+
                             <!-- Share Button with Web Share API & Fallback Copy -->
                             <div x-data="{
                                 copied: false,
