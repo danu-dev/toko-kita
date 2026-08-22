@@ -148,7 +148,7 @@
                         <input type="hidden" name="latitude" :value="addressLat">
                         <input type="hidden" name="longitude" :value="addressLng">
 
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
                                 <label class="block text-gray-600 mb-1">Label Alamat</label>
                                 <input type="text" name="label" required placeholder="Rumah / Kantor / Kos" class="w-full px-3 py-1.5 bg-[#FAF8F2] border border-gray-200 rounded-xl">
@@ -158,7 +158,7 @@
                                 <input type="text" name="city" value="Malang" required class="w-full px-3 py-1.5 bg-[#FAF8F2] border border-gray-200 rounded-xl">
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
                                 <label class="block text-gray-600 mb-1">Nama Penerima</label>
                                 <input type="text" name="recipient_name" required placeholder="Nama" class="w-full px-3 py-1.5 bg-[#FAF8F2] border border-gray-200 rounded-xl">
