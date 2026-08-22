@@ -1,13 +1,16 @@
 <?php
 
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\Request;
+
 define('LARAVEL_START', microtime(true));
 
-// Auto-create /tmp subdirectories for serverless runtime
+// Setup tmp paths
 $dirs = [
+    '/tmp/views',
     '/tmp/framework/views',
     '/tmp/framework/sessions',
     '/tmp/framework/cache',
-    '/tmp/views',
     '/tmp/cache',
     '/tmp/logs'
 ];
@@ -17,15 +20,16 @@ foreach ($dirs as $dir) {
     }
 }
 
-// Copy sqlite database to /tmp if not present
+// Copy sqlite database to writable /tmp
 $sourceDb = __DIR__ . '/../database/database.sqlite';
 $targetDb = '/tmp/database.sqlite';
-if (!file_exists($targetDb)) {
-    if (file_exists($sourceDb)) {
-        @copy($sourceDb, $targetDb);
-    } else {
-        @touch($targetDb);
-    }
+if (!file_exists($targetDb) && file_exists($sourceDb)) {
+    @copy($sourceDb, $targetDb);
+}
+
+// Fallback REMOTE_ADDR
+if (empty($_SERVER['REMOTE_ADDR'])) {
+    $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 }
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -33,21 +37,10 @@ require __DIR__ . '/../vendor/autoload.php';
 /** @var \Illuminate\Foundation\Application $app */
 $app = require __DIR__ . '/../bootstrap/app.php';
 
-// Force serverless runtime bindings
-$app->booting(function () use ($app) {
-    $app['config']->set('app.env', 'production');
-    $app['config']->set('app.debug', false);
-    $app['config']->set('app.key', 'base64:fBH0BNGZVkziLbxJhRpDPTckE+RnaxiXZMUro63g4uY=');
-    $app['config']->set('session.driver', 'array');
-    $app['config']->set('cache.default', 'array');
-    $app['config']->set('logging.default', 'errorlog');
-    $app['config']->set('view.compiled', '/tmp/framework/views');
-    $app['config']->set('database.default', 'sqlite');
-    $app['config']->set('database.connections.sqlite.database', '/tmp/database.sqlite');
-});
+$app->useStoragePath('/tmp');
 
-$kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
-$request = \Illuminate\Http\Request::capture();
+$kernel = $app->make(Kernel::class);
+$request = Request::capture();
 
 $response = $kernel->handle($request);
 $response->send();
