@@ -69,6 +69,11 @@
 
                         <!-- Action Buttons by State -->
                         <div class="flex items-center gap-2">
+                            <!-- Direct Chat Buyer Button -->
+                            <a href="{{ route('chats.show', \App\Models\Chat::firstOrCreate(['buyer_id' => $order->buyer_id, 'store_id' => $order->store_id])->id) }}" class="p-2 rounded-xl bg-[#FAF8F2] hover:bg-emerald-50 text-[#0B5A45] border border-gray-200 transition" title="Chat Pembeli">
+                                <i data-lucide="message-square" class="w-4 h-4"></i>
+                            </a>
+
                             @if($order->status === 'menunggu_konfirmasi')
                                 <form action="{{ route('seller.orders.status', $order->id) }}" method="POST">
                                     @csrf

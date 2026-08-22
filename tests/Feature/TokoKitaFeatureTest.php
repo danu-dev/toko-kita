@@ -392,5 +392,15 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewHas('status', 'selesai');
     }
+
+    public function test_seller_can_access_chat_from_orders_page()
+    {
+        $seller = User::where('email', 'seller@tokokita.id')->first();
+        $this->actingAs($seller);
+
+        $response = $this->get(route('seller.orders'));
+        $response->assertStatus(200);
+        $response->assertSee('title="Chat Pembeli"', false);
+    }
 }
 
