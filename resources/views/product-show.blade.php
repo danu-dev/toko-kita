@@ -50,7 +50,14 @@
                 <div class="flex items-center gap-3">
                     <img src="{{ $product->store->logo ?: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=100&q=80' }}" class="w-12 h-12 rounded-xl object-cover border border-gray-100">
                     <div>
-                        <span class="text-[10px] text-[#0E9F6E] font-bold uppercase">Mitra UMKM</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-[#0E9F6E] font-bold uppercase">Mitra UMKM</span>
+                            @if($product->store->is_open)
+                                <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-200">BUKA</span>
+                            @else
+                                <span class="text-[9px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-md border border-red-200">TUTUP</span>
+                            @endif
+                        </div>
                         <h4 class="font-bold text-sm text-[#1E2723] group-hover:text-[#0E9F6E] transition">{{ $product->store->name }}</h4>
                         <p class="text-xs text-gray-500">{{ $product->store->city }} • {{ $product->store->operational_hours }}</p>
                     </div>

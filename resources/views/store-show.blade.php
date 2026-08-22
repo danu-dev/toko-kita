@@ -83,10 +83,16 @@
                     <span class="font-bold text-gray-800 text-sm mt-0.5 block">{{ $store->operational_hours }}</span>
                 </div>
                 <div>
-                    <span class="text-gray-400 block text-[11px]">Status</span>
-                    <span class="inline-flex items-center gap-1 text-[#0E9F6E] font-bold text-xs mt-0.5">
-                        <span class="w-2 h-2 rounded-full bg-[#0E9F6E] animate-pulse"></span> Buka Sekarang
-                    </span>
+                    <span class="text-gray-400 block text-[11px]">Status Operasional</span>
+                    @if($store->is_open)
+                        <span class="inline-flex items-center gap-1.5 text-[#0E9F6E] font-bold text-xs mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-[#0E9F6E] animate-pulse"></span> Buka Sekarang
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1.5 text-red-600 font-bold text-xs mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span> Tutup Sementara
+                        </span>
+                    @endif
                 </div>
             </div>
         </div>

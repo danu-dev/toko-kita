@@ -321,5 +321,14 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertSee($order->order_number);
         $response->assertSee($order->store->name);
     }
+
+    public function test_store_open_status_displayed()
+    {
+        $store = Store::where('slug', 'warung-nasi-bu-siti')->first();
+        $response = $this->get('/toko/' . $store->slug);
+        $response->assertStatus(200);
+        $response->assertSee('Status Operasional');
+        $response->assertSee('Buka Sekarang');
+    }
 }
 
