@@ -55,6 +55,8 @@ class TokoKitaFeatureTest extends TestCase
         $response = $this->get('/produk/' . $product->slug);
         $response->assertStatus(200);
         $response->assertSee('Rawon Daging Sapi Spesial');
+        $response->assertSee('Estimasi Sampai');
+        $response->assertSee('15 - 30 Menit');
     }
 
     public function test_buyer_can_add_to_cart_and_checkout()

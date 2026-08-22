@@ -106,6 +106,29 @@
                             </span>
                         @endif
                     </div>
+
+                    <!-- Delivery SLA & Hyperlocal Guarantee Box -->
+                    <div class="grid grid-cols-2 gap-3 mt-5 p-3.5 bg-[#FAF8F2] rounded-2xl border border-gray-200/80 text-xs">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-emerald-100/80 text-[#0B5A45] flex items-center justify-center shrink-0">
+                                <i data-lucide="timer" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-gray-400 font-bold uppercase block">Estimasi Sampai</span>
+                                <span class="font-bold text-[#1E2723]">15 - 30 Menit</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-amber-100/80 text-amber-800 flex items-center justify-center shrink-0">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-gray-400 font-bold uppercase block">Jaminan Segar</span>
+                                <span class="font-bold text-[#1E2723]">100% Produk Lokal</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="border-t border-gray-100 pt-4">
