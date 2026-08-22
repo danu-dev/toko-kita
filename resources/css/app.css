@@ -1,0 +1,119 @@
+@import 'tailwindcss';
+
+@theme {
+    /* Design Tokens from PRD Section 4.1 */
+    --color-kita-green: #0E9F6E;
+    --color-deep-teal: #0B5A45;
+    --color-pasar-amber: #F2A93B;
+    --color-ember-red: #E15554;
+    --color-warm-paper: #FAF8F2;
+    --color-ink-charcoal: #1E2723;
+
+    /* Semantic Tints */
+    --color-kita-50: #EDFDF5;
+    --color-kita-100: #D3F9E5;
+    --color-kita-200: #A8F2CC;
+    --color-kita-500: #0E9F6E;
+    --color-kita-600: #0A8258;
+    --color-kita-700: #086644;
+    --color-kita-800: #0B5A45;
+
+    --color-amber-50: #FEF9EE;
+    --color-amber-100: #FDF1D6;
+    --color-amber-500: #F2A93B;
+    --color-amber-600: #D88E23;
+
+    /* Typography */
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+    background-color: var(--color-warm-paper);
+    color: var(--color-ink-charcoal);
+    font-family: var(--font-body);
+    -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: var(--font-display);
+}
+
+.font-mono {
+    font-family: var(--font-mono);
+}
+
+/* Signature Element — "Status Pulse" Animation */
+@keyframes status-pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(14, 159, 110, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(14, 159, 110, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(14, 159, 110, 0);
+    }
+}
+
+@keyframes status-pulse-amber {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(242, 169, 59, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(242, 169, 59, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(242, 169, 59, 0);
+    }
+}
+
+@keyframes status-pulse-red {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(225, 85, 84, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(225, 85, 84, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(225, 85, 84, 0);
+    }
+}
+
+.pulse-green {
+    animation: status-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.pulse-amber {
+    animation: status-pulse-amber 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.pulse-red {
+    animation: status-pulse-red 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* Custom scrollbar for clean app UI */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #F0EDE4;
+}
+::-webkit-scrollbar-thumb {
+    background: #D1CBBF;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #0E9F6E;
+}
