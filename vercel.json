@@ -30,7 +30,7 @@
         "APP_NAME": "TokoKita",
         "APP_ENV": "production",
         "APP_DEBUG": "false",
-        "APP_KEY": "base64:XG8o9U0b+Tok0K1taUMKMHyperLocaL20260822A4Yv9g=",
+        "APP_KEY": "base64:fBH0BNGZVkziLbxJhRpDPTckE+RnaxiXZMUro63g4uY=",
         "LOG_CHANNEL": "stderr",
         "CACHE_STORE": "array",
         "SESSION_DRIVER": "cookie",

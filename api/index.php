@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Http\Request;
-
 define('LARAVEL_START', microtime(true));
 
 $dirs = [
@@ -44,24 +41,4 @@ require __DIR__ . '/../vendor/autoload.php';
 /** @var \Illuminate\Foundation\Application $app */
 $app = require __DIR__ . '/../bootstrap/app.php';
 
-try {
-    $kernel = $app->make(Kernel::class);
-    $request = Request::capture();
-    $response = $kernel->handle($request);
-    
-    if ($response->getStatusCode() === 500 && $response->exception) {
-        throw $response->exception;
-    }
-    
-    $response->send();
-    $kernel->terminate($request, $response);
-} catch (\Throwable $e) {
-    header('HTTP/1.1 200 OK', true, 200);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "SERVERLESS KERNEL EXCEPTION INTERCEPTED:\n";
-    echo "Class: " . get_class($e) . "\n";
-    echo "Message: " . $e->getMessage() . "\n";
-    echo "File: " . $e->getFile() . " : line " . $e->getLine() . "\n\n";
-    echo "Trace:\n" . $e->getTraceAsString();
-    exit;
-}
+$app->handleRequest(\Illuminate\Http\Request::capture());
