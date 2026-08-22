@@ -41,6 +41,13 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertSee('Rawon Daging Sapi Spesial');
     }
 
+    public function test_explore_page_filters_by_price_and_sorting()
+    {
+        $response = $this->get('/jelajah?sort=price_asc&min_price=10000&max_price=50000&promo=1');
+        $response->assertStatus(200);
+        $response->assertSee('Produk Ditemukan');
+    }
+
     public function test_product_detail_page_loads()
     {
         $product = Product::where('slug', 'rawon-daging-sapi-spesial')->first();

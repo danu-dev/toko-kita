@@ -49,6 +49,10 @@ class HomeController extends Controller
         $query = $request->input('q');
         $categoryId = $request->input('category');
         $storeId = $request->input('store');
+        $sort = $request->input('sort', 'latest'); // latest, price_asc, price_desc, rating, popular
+        $minPrice = $request->input('min_price');
+        $maxPrice = $request->input('max_price');
+        $onlyPromo = $request->boolean('promo');
 
         $categories = Category::where('is_active', true)->get();
 
@@ -71,7 +75,38 @@ class HomeController extends Controller
             $products->where('store_id', $storeId);
         }
 
-        $products = $products->latest()->paginate(12)->withQueryString();
+        if ($minPrice !== null && $minPrice !== '') {
+            $products->where('price', '>=', (float)$minPrice);
+        }
+
+        if ($maxPrice !== null && $maxPrice !== '') {
+            $products->where('price', '<=', (float)$maxPrice);
+        }
+
+        if ($onlyPromo) {
+            $products->whereNotNull('compare_at_price');
+        }
+
+        // Sorting
+        switch ($sort) {
+            case 'price_asc':
+                $products->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $products->orderBy('price', 'desc');
+                break;
+            case 'rating':
+                $products->orderByDesc('rating');
+                break;
+            case 'popular':
+                $products->orderByDesc('total_sales');
+                break;
+            default:
+                $products->latest();
+                break;
+        }
+
+        $products = $products->paginate(12)->withQueryString();
 
         $stores = Store::where('status', 'approved');
         if ($query) {
@@ -79,7 +114,17 @@ class HomeController extends Controller
         }
         $stores = $stores->take(4)->get();
 
-        return view('explore', compact('products', 'categories', 'query', 'categoryId', 'stores'));
+        return view('explore', compact(
+            'products',
+            'categories',
+            'query',
+            'categoryId',
+            'stores',
+            'sort',
+            'minPrice',
+            'maxPrice',
+            'onlyPromo'
+        ));
     }
 
     public function storeShow(string $slug)

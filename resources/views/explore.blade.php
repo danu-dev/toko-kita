@@ -7,29 +7,61 @@
 
     <!-- Search & Filter Header -->
     <div class="bg-white p-4 sm:p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
-        <form action="{{ route('explore') }}" method="GET" class="flex flex-col sm:flex-row gap-3">
-            <div class="flex-1 relative">
-                <input type="text" name="q" value="{{ $query }}" placeholder="Cari masakan, snack, sembako, kerajinan..." class="w-full pl-10 pr-4 py-2.5 bg-[#FAF8F2] border border-gray-200 rounded-2xl text-sm focus:border-[#0E9F6E] focus:outline-none">
-                <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5"></i>
+        <form action="{{ route('explore') }}" method="GET" class="space-y-3">
+            <div class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1 relative">
+                    <input type="text" name="q" value="{{ $query }}" placeholder="Cari masakan, snack, sembako, kerajinan..." class="w-full pl-10 pr-4 py-2.5 bg-[#FAF8F2] border border-gray-200 rounded-2xl text-sm focus:border-[#0E9F6E] focus:outline-none">
+                    <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5"></i>
+                </div>
+                <select name="category" class="px-4 py-2.5 bg-[#FAF8F2] border border-gray-200 rounded-2xl text-sm focus:border-[#0E9F6E] focus:outline-none">
+                    <option value="">Semua Kategori</option>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}" {{ $categoryId == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+                <select name="sort" class="px-4 py-2.5 bg-[#FAF8F2] border border-gray-200 rounded-2xl text-sm focus:border-[#0E9F6E] focus:outline-none">
+                    <option value="latest" {{ $sort === 'latest' ? 'selected' : '' }}>Terbaru</option>
+                    <option value="popular" {{ $sort === 'popular' ? 'selected' : '' }}>Terlaris</option>
+                    <option value="rating" {{ $sort === 'rating' ? 'selected' : '' }}>Rating Tertinggi</option>
+                    <option value="price_asc" {{ $sort === 'price_asc' ? 'selected' : '' }}>Harga: Rendah ke Tinggi</option>
+                    <option value="price_desc" {{ $sort === 'price_desc' ? 'selected' : '' }}>Harga: Tinggi ke Rendah</option>
+                </select>
+                <button type="submit" class="bg-[#0E9F6E] hover:bg-[#086644] text-white px-6 py-2.5 rounded-2xl font-bold text-sm shadow-sm transition">
+                    Terapkan
+                </button>
             </div>
-            <select name="category" onchange="this.form.submit()" class="px-4 py-2.5 bg-[#FAF8F2] border border-gray-200 rounded-2xl text-sm focus:border-[#0E9F6E] focus:outline-none">
-                <option value="">Semua Kategori</option>
-                @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}" {{ $categoryId == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                @endforeach
-            </select>
-            <button type="submit" class="bg-[#0E9F6E] hover:bg-[#086644] text-white px-6 py-2.5 rounded-2xl font-bold text-sm shadow-sm transition">
-                Cari
-            </button>
+
+            <!-- Price Range & Promo Quick Filter Bar -->
+            <div class="flex flex-wrap items-center gap-3 pt-1 text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="text-gray-500 font-semibold">Rentang Harga:</span>
+                    <input type="number" name="min_price" value="{{ $minPrice }}" placeholder="Min (Rp)" class="w-28 px-3 py-1.5 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs focus:border-[#0E9F6E] focus:outline-none">
+                    <span class="text-gray-400">-</span>
+                    <input type="number" name="max_price" value="{{ $maxPrice }}" placeholder="Maks (Rp)" class="w-28 px-3 py-1.5 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs focus:border-[#0E9F6E] focus:outline-none">
+                </div>
+
+                <label class="inline-flex items-center gap-2 cursor-pointer bg-[#FAF8F2] hover:bg-[#F2EFE9] px-3 py-1.5 rounded-xl border border-gray-200 select-none">
+                    <input type="checkbox" name="promo" value="1" {{ $onlyPromo ? 'checked' : '' }} class="rounded text-[#0E9F6E] focus:ring-[#0E9F6E]">
+                    <span class="font-bold text-[#1E2723] flex items-center gap-1">
+                        <i data-lucide="tag" class="w-3.5 h-3.5 text-[#F2A93B]"></i> Hanya Promo
+                    </span>
+                </label>
+
+                @if($query || $categoryId || $minPrice || $maxPrice || $onlyPromo || ($sort && $sort !== 'latest'))
+                    <a href="{{ route('explore') }}" class="text-red-500 hover:underline font-semibold ml-auto">
+                        Reset Filter
+                    </a>
+                @endif
+            </div>
         </form>
 
         <!-- Category Pills Bar -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-            <a href="{{ route('explore') }}" class="px-3.5 py-1.5 rounded-full whitespace-nowrap font-semibold {{ empty($categoryId) ? 'bg-[#0E9F6E] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+            <a href="{{ route('explore', array_merge(request()->except(['category', 'page']))) }}" class="px-3.5 py-1.5 rounded-full whitespace-nowrap font-semibold {{ empty($categoryId) ? 'bg-[#0E9F6E] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                 Semua
             </a>
             @foreach($categories as $c)
-                <a href="{{ route('explore', ['category' => $c->id, 'q' => $query]) }}" class="px-3.5 py-1.5 rounded-full whitespace-nowrap font-semibold {{ $categoryId == $c->id ? 'bg-[#0E9F6E] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                <a href="{{ route('explore', array_merge(request()->except(['category', 'page']), ['category' => $c->id])) }}" class="px-3.5 py-1.5 rounded-full whitespace-nowrap font-semibold {{ $categoryId == $c->id ? 'bg-[#0E9F6E] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                     {{ $c->name }}
                 </a>
             @endforeach
