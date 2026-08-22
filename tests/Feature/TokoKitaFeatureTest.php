@@ -214,4 +214,15 @@ class TokoKitaFeatureTest extends TestCase
         $approveRes->assertRedirect();
         $this->assertEquals('approved', $pendingStore->fresh()->status);
     }
+
+    public function test_seller_can_export_reports_csv()
+    {
+        $seller = User::where('email', 'seller@tokokita.id')->first();
+        $this->actingAs($seller);
+
+        $response = $this->get('/mitra/laporan/export-csv');
+        $response->assertStatus(200);
+        $this->assertTrue(str_contains($response->headers->get('content-type'), 'text/csv'));
+        $this->assertTrue(str_contains($response->headers->get('content-disposition'), 'attachment; filename='));
+    }
 }

@@ -77,6 +77,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('mitra')->name('seller.')->gr
     Route::post('/dompet/tarik', [SellerController::class, 'requestWithdrawal'])->name('wallet.withdraw');
 
     Route::get('/laporan', [SellerController::class, 'reports'])->name('reports');
+    Route::get('/laporan/export-csv', [SellerController::class, 'exportReportsCsv'])->name('reports.export-csv');
     Route::post('/ulasan/{id}/balas', [SellerController::class, 'replyReview'])->name('reviews.reply');
 
     Route::get('/pengaturan', [SellerController::class, 'settings'])->name('settings');

@@ -5,9 +5,17 @@
 @section('content')
 <div class="space-y-6">
 
-    <div>
-        <h1 class="font-display font-black text-2xl text-[#0B5A45]">Laporan Penjualan & Ulasan Toko</h1>
-        <p class="text-xs text-gray-500">Pantau performa harian omset toko dan respon ulasan dari pelanggan.</p>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="font-display font-black text-2xl text-[#0B5A45]">Laporan Penjualan & Ulasan Toko</h1>
+            <p class="text-xs text-gray-500">Pantau performa harian omset toko dan respon ulasan dari pelanggan.</p>
+        </div>
+        <div>
+            <a href="{{ route('seller.reports.export-csv') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0B5A45] hover:bg-[#084233] text-white text-xs font-bold rounded-2xl shadow-sm hover:shadow transition-all">
+                <i data-lucide="download" class="w-4 h-4 text-[#F2A93B]"></i>
+                <span>Export Laporan Transaksi (.CSV)</span>
+            </a>
+        </div>
     </div>
 
     <!-- Sales Trend Table -->

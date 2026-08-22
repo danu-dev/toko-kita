@@ -300,6 +300,74 @@ class SellerController extends Controller
         return view('seller.reports', compact('store', 'dailySales', 'reviews'));
     }
 
+    public function exportReportsCsv()
+    {
+        $store = $this->getStore();
+        if (!$store) {
+            abort(403);
+        }
+
+        $orders = Order::with(['buyer', 'items.product', 'payment'])
+            ->where('store_id', $store->id)
+            ->latest()
+            ->get();
+
+        $filename = 'laporan-penjualan-' . Str::slug($store->name) . '-' . date('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0'
+        ];
+
+        $callback = function () use ($orders) {
+            $file = fopen('php://output', 'w');
+            // Add UTF-8 BOM for Excel compatibility
+            fputs($file, "\xEF\xBB\xBF");
+
+            // Header row
+            fputcsv($file, [
+                'Nomor Pesanan',
+                'Tanggal',
+                'Nama Pembeli',
+                'Status Pesanan',
+                'Metode Pembayaran',
+                'Tipe Pengiriman',
+                'Item Produk & Jumlah',
+                'Subtotal (Rp)',
+                'Ongkir (Rp)',
+                'Biaya Admin Platform (Rp)',
+                'Pendapatan Bersih Penjual (Rp)'
+            ]);
+
+            foreach ($orders as $order) {
+                $itemList = $order->items->map(function ($item) {
+                    return ($item->product->name ?? 'Item') . ' (x' . $item->quantity . ')';
+                })->implode('; ');
+
+                fputcsv($file, [
+                    $order->order_number,
+                    $order->created_at->format('Y-m-d H:i:s'),
+                    $order->buyer->name ?? 'Pelanggan',
+                    strtoupper(str_replace('_', ' ', $order->status)),
+                    strtoupper($order->payment->payment_method ?? 'QRIS'),
+                    $order->delivery_type === 'antar' ? 'Diantar ke Alamat' : 'Pickup di Toko',
+                    $itemList,
+                    $order->subtotal,
+                    $order->shipping_cost,
+                    $order->admin_fee,
+                    $order->seller_earnings
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function replyReview(Request $request, int $id)
     {
         $store = $this->getStore();
