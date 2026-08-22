@@ -18,33 +18,63 @@
         </div>
     </div>
 
-    <!-- Sales Trend Table -->
-    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
-        <h3 class="font-display font-bold text-base text-[#0B5A45]">Grafik / Ringkasan Penjualan 14 Hari Terakhir</h3>
+    <!-- Sales Trend Table & Top Selling Products Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Sales Trend Table -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+            <h3 class="font-display font-bold text-base text-[#0B5A45]">Grafik / Ringkasan Penjualan 14 Hari Terakhir</h3>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-                <thead>
-                    <tr class="text-gray-400 border-b border-gray-100">
-                        <th class="pb-3">TANGGAL</th>
-                        <th class="pb-3">PESANAN SELESAI</th>
-                        <th class="pb-3">TOTAL PENDAPATAN BERSIH</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50">
-                    @forelse($dailySales as $sale)
-                        <tr>
-                            <td class="py-3 font-mono font-bold text-gray-800">{{ date('d M Y', strtotime($sale->date)) }}</td>
-                            <td class="py-3 font-mono text-gray-700">{{ $sale->total_orders }} Transaksi</td>
-                            <td class="py-3 font-mono font-bold text-[#0B5A45]">Rp {{ number_format($sale->total_earnings, 0, ',', '.') }}</td>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="text-gray-400 border-b border-gray-100">
+                            <th class="pb-3">TANGGAL</th>
+                            <th class="pb-3">PESANAN SELESAI</th>
+                            <th class="pb-3">TOTAL PENDAPATAN BERSIH</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" class="py-6 text-center text-gray-400">Belum ada data penjualan tercatat.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @forelse($dailySales as $sale)
+                            <tr>
+                                <td class="py-3 font-mono font-bold text-gray-800">{{ date('d M Y', strtotime($sale->date)) }}</td>
+                                <td class="py-3 font-mono text-gray-700">{{ $sale->total_orders }} Transaksi</td>
+                                <td class="py-3 font-mono font-bold text-[#0B5A45]">Rp {{ number_format($sale->total_earnings, 0, ',', '.') }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="py-6 text-center text-gray-400">Belum ada data penjualan tercatat.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Selling Products Leaderboard -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+            <h3 class="font-display font-bold text-base text-[#0B5A45]">Top 5 Menu / Produk Terlaris</h3>
+
+            <div class="space-y-3">
+                @forelse($topSellingProducts as $idx => $tp)
+                    <div class="flex items-center justify-between p-3 rounded-2xl bg-[#FAF8F2] border border-gray-100 text-xs">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <span class="w-6 h-6 rounded-xl flex items-center justify-center font-bold font-mono text-[11px] {{ $idx === 0 ? 'bg-[#F2A93B] text-[#1E2723]' : 'bg-gray-200 text-gray-700' }}">
+                                #{{ $idx + 1 }}
+                            </span>
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-gray-800 truncate">{{ $tp->name }}</h4>
+                                <span class="font-mono text-[#0B5A45] font-bold text-[11px]">Rp {{ number_format($tp->price, 0, ',', '.') }}</span>
+                            </div>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <span class="font-mono font-bold text-gray-900 text-xs block">{{ $tp->total_sales }} Terjual</span>
+                            <span class="text-[10px] text-gray-400 font-semibold">Stok: {{ $tp->stock }}</span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-6 text-gray-400 text-xs">Belum ada produk terdaftar.</div>
+                @endforelse
+            </div>
         </div>
     </div>
 

@@ -372,5 +372,15 @@ class TokoKitaFeatureTest extends TestCase
 
         $this->assertEquals(!$initialStatus, $product->fresh()->is_active);
     }
+
+    public function test_seller_reports_display_top_products()
+    {
+        $seller = User::where('email', 'seller@tokokita.id')->first();
+        $this->actingAs($seller);
+
+        $response = $this->get(route('seller.reports'));
+        $response->assertStatus(200);
+        $response->assertSee('Top 5 Menu / Produk Terlaris');
+    }
 }
 

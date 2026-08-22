@@ -302,12 +302,17 @@ class SellerController extends Controller
             ->take(14)
             ->get();
 
+        $topSellingProducts = Product::where('store_id', $store->id)
+            ->orderByDesc('total_sales')
+            ->take(5)
+            ->get();
+
         $reviews = Review::with(['buyer', 'product'])
             ->where('store_id', $store->id)
             ->latest()
             ->get();
 
-        return view('seller.reports', compact('store', 'dailySales', 'reviews'));
+        return view('seller.reports', compact('store', 'dailySales', 'topSellingProducts', 'reviews'));
     }
 
     public function exportReportsCsv()
