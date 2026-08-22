@@ -55,12 +55,18 @@ class HomeController extends Controller
         $maxPrice = $request->input('max_price');
         $minRating = $request->input('min_rating');
         $onlyPromo = $request->boolean('promo');
+        $onlyOpen = $request->boolean('open_only');
 
         $categories = Category::where('is_active', true)->get();
 
         $products = Product::with(['store', 'category'])
             ->where('is_active', true)
-            ->whereHas('store', fn($q) => $q->where('status', 'approved'));
+            ->whereHas('store', function($q) use ($onlyOpen) {
+                $q->where('status', 'approved');
+                if ($onlyOpen) {
+                    $q->where('is_open', true);
+                }
+            });
 
         if ($query) {
             $products->where(function($q) use ($query) {
@@ -130,7 +136,8 @@ class HomeController extends Controller
             'minPrice',
             'maxPrice',
             'minRating',
-            'onlyPromo'
+            'onlyPromo',
+            'onlyOpen'
         ));
     }
 

@@ -53,11 +53,18 @@
                 <label class="inline-flex items-center gap-2 cursor-pointer bg-[#FAF8F2] hover:bg-[#F2EFE9] px-3 py-1.5 rounded-xl border border-gray-200 select-none">
                     <input type="checkbox" name="promo" value="1" {{ $onlyPromo ? 'checked' : '' }} class="rounded text-[#0E9F6E] focus:ring-[#0E9F6E]">
                     <span class="font-bold text-[#1E2723] flex items-center gap-1">
-                        <i data-lucide="tag" class="w-3.5 h-3.5 text-[#F2A93B]"></i> Hanya Promo
+                        <i data-lucide="tag" class="w-3.5 h-3.5 text-[#F2A93B]"></i> Diskon/Promo
                     </span>
                 </label>
 
-                @if($query || $categoryId || $minPrice || $maxPrice || $minRating || $onlyPromo || ($sort && $sort !== 'latest'))
+                <label class="inline-flex items-center gap-2 cursor-pointer bg-[#FAF8F2] hover:bg-[#F2EFE9] px-3 py-1.5 rounded-xl border border-gray-200 select-none">
+                    <input type="checkbox" name="open_only" value="1" {{ $onlyOpen ? 'checked' : '' }} class="rounded text-[#0E9F6E] focus:ring-[#0E9F6E]">
+                    <span class="font-bold text-[#1E2723] flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-[#0E9F6E] animate-pulse"></span> Buka Sekarang
+                    </span>
+                </label>
+
+                @if($query || $categoryId || $minPrice || $maxPrice || $minRating || $onlyPromo || $onlyOpen || ($sort && $sort !== 'latest'))
                     <a href="{{ route('explore') }}" class="text-red-500 hover:underline font-semibold ml-auto">
                         Reset Filter
                     </a>

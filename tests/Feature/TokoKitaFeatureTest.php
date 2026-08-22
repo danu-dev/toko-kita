@@ -519,6 +519,20 @@ class TokoKitaFeatureTest extends TestCase
             'quantity' => 2,
         ]);
     }
+
+    public function test_explore_page_filters_by_open_stores_only()
+    {
+        // Set one store to closed
+        $store = Store::where('slug', 'warung-nasi-bu-siti')->first();
+        $store->is_open = false;
+        $store->save();
+
+        $closedProduct = Product::where('store_id', $store->id)->first();
+
+        $response = $this->get('/jelajah?open_only=1');
+        $response->assertStatus(200);
+        $response->assertDontSee($closedProduct->name);
+    }
 }
 
 
