@@ -12,6 +12,28 @@
         </div>
     </div>
 
+    <!-- Order Status Tabs Filter Bar -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+        <a href="{{ route('orders.index') }}" class="px-4 py-2 rounded-2xl whitespace-nowrap font-bold transition {{ empty($status) ? 'bg-[#0E9F6E] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+            Semua
+        </a>
+        <a href="{{ route('orders.index', ['status' => 'menunggu_konfirmasi']) }}" class="px-4 py-2 rounded-2xl whitespace-nowrap font-bold transition {{ $status === 'menunggu_konfirmasi' ? 'bg-[#0E9F6E] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+            Menunggu
+        </a>
+        <a href="{{ route('orders.index', ['status' => 'diproses']) }}" class="px-4 py-2 rounded-2xl whitespace-nowrap font-bold transition {{ $status === 'diproses' ? 'bg-[#0E9F6E] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+            Diproses
+        </a>
+        <a href="{{ route('orders.index', ['status' => 'siap_diambil_dikirim']) }}" class="px-4 py-2 rounded-2xl whitespace-nowrap font-bold transition {{ $status === 'siap_diambil_dikirim' ? 'bg-[#0E9F6E] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+            Siap Dikirim
+        </a>
+        <a href="{{ route('orders.index', ['status' => 'selesai']) }}" class="px-4 py-2 rounded-2xl whitespace-nowrap font-bold transition {{ $status === 'selesai' ? 'bg-[#0E9F6E] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+            Selesai
+        </a>
+        <a href="{{ route('orders.index', ['status' => 'dibatalkan']) }}" class="px-4 py-2 rounded-2xl whitespace-nowrap font-bold transition {{ $status === 'dibatalkan' ? 'bg-[#0E9F6E] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+            Dibatalkan
+        </a>
+    </div>
+
     @if($orders->isEmpty())
         <div class="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm space-y-4">
             <div class="w-16 h-16 rounded-3xl bg-[#FAF8F2] text-gray-400 mx-auto flex items-center justify-center">

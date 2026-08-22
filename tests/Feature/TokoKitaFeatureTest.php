@@ -382,5 +382,15 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Top 5 Menu / Produk Terlaris');
     }
+
+    public function test_buyer_can_filter_orders_by_status()
+    {
+        $buyer = User::where('email', 'buyer@tokokita.id')->first();
+        $this->actingAs($buyer);
+
+        $response = $this->get(route('orders.index', ['status' => 'selesai']));
+        $response->assertStatus(200);
+        $response->assertViewHas('status', 'selesai');
+    }
 }
 

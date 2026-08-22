@@ -310,14 +310,20 @@ class BuyerController extends Controller
     }
 
     // ORDERS & TRACKING
-    public function ordersIndex()
+    public function ordersIndex(Request $request)
     {
-        $orders = Order::with(['store', 'items.product', 'payment'])
-            ->where('buyer_id', Auth::id())
-            ->latest()
-            ->paginate(10);
+        $status = $request->input('status');
 
-        return view('buyer.orders-index', compact('orders'));
+        $query = Order::with(['store', 'items.product', 'payment'])
+            ->where('buyer_id', Auth::id());
+
+        if ($status && in_array($status, ['menunggu_konfirmasi', 'diproses', 'siap_diambil_dikirim', 'selesai', 'dibatalkan', 'retur_refund'])) {
+            $query->where('status', $status);
+        }
+
+        $orders = $query->latest()->paginate(10)->withQueryString();
+
+        return view('buyer.orders-index', compact('orders', 'status'));
     }
 
     public function trackOrder(int $id)
