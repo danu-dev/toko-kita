@@ -1,0 +1,47 @@
+name: TokoKita CI/CD Auto-Test & Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo, sqlite3, pdo_sqlite, bcmath, gd
+        coverage: none
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Copy .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+    - name: Install PHP Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Install Frontend Dependencies & Build
+      run: |
+        npm install
+        npm run build
+
+    - name: Generate Application Key & Prepare SQLite
+      run: |
+        php artisan key:generate
+        touch database/database.sqlite
+        php artisan migrate:fresh --seed
+
+    - name: Execute Feature & Unit Tests
+      run: php artisan test

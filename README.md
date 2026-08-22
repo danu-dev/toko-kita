@@ -1,6 +1,6 @@
-# 🏪 Toko Kita — Platform Marketplace Hyperlocal UMKM
+# 🏪 TokoKita. — Platform Marketplace Hyperlocal UMKM
 
-**Toko Kita** adalah platform e-commerce hyperlocal yang menghubungkan usaha mikro, kecil, dan menengah (UMKM) seperti warung kelontong, kuliner rumahan, dan kriya lokal dengan pembeli di sekitar area mereka dengan pengalaman cepat dan modern (*Gojek-like UX*).
+**TokoKita.** adalah platform e-commerce hyperlocal yang menghubungkan usaha mikro, kecil, dan menengah (UMKM) seperti warung kelontong, kuliner rumahan, dan kriya lokal dengan pembeli di sekitar area mereka dengan pengalaman cepat dan modern (*Gojek-like UX*).
 
 ---
 
@@ -41,14 +41,24 @@
 
 ---
 
-## 🚀 Tech Stack
-- **Backend Framework**: Laravel 11 / 12 (PHP 8.5)
-- **Role & Permission**: Spatie Laravel-Permission
-- **Frontend & Reactivity**: Tailwind CSS v4, Livewire 3 / Volt, Alpine.js
-- **Database**: SQLite (Development & Testing) / MySQL / PostgreSQL
-- **Mapping & Geolocation**: Leaflet.js & OpenStreetMap
-- **Charts & Data**: Chart.js
-- **Testing**: PHPUnit / Pest Feature Tests
+## 🚀 Loop Otomatisasi Kerja & Live Dev
+
+Tersedia skrip automasi untuk mempermudah alur kerja harian Anda:
+
+### 1. Menjalankan Dev Loop Lengkap (Server + Vite + DB + Auto-Test)
+```bash
+./bin/dev-loop.sh
+```
+Perintah ini akan secara otomatis:
+- Menyiapkan database SQLite & migrasi.
+- Menjalankan automated test suite.
+- Menjalankan server Laravel di `http://localhost:8000`.
+- Menjalankan Vite hot-module reload compiler.
+
+### 2. CI/CD Otomatis GitHub Actions & Vercel
+Setiap kali Anda melakukan `git push origin main`:
+- GitHub Actions (`.github/workflows/ci-cd.yml`) otomatis memvalidasi dependensi PHP, Node.js, migrasi, dan seluruh 12 test suite.
+- Vercel otomatis mengompilasi aset dan mendeploy pembaruan secara instan ke URL live: **[https://toko-kita-phi.vercel.app](https://toko-kita-phi.vercel.app)**.
 
 ---
 
@@ -56,7 +66,7 @@
 
 1. **Clone repository & masuk ke folder project**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/danu-dev/toko-kita.git
    cd toko-kita
    ```
 
@@ -105,18 +115,10 @@
 ```bash
 php artisan test
 ```
-Seluruh 12 unit & feature test mencakup alur state machine pesanan, batasan privasi admin, pencegahan pembelian mandiri (*anti self-purchase*), validasi stok, dan penukaran poin loyalitas.
 
 ---
 
-## ☁️ Deployment ke Vercel
+## ☁️ Tautan Deployment
 
-Aplikasi telah dilengkapi dengan konfigurasi `vercel.json` dan serverless entry point `api/index.php`.
-
-Untuk melakukan deploy via Vercel CLI:
-```bash
-npx vercel
-# atau untuk production deployment:
-npx vercel --prod
-```
-Pastikan variabel environment seperti `APP_KEY` dan database telah disetting pada dashboard Vercel / serverless database (PlanetScale / Supabase / Neon).
+- **GitHub Repository**: [https://github.com/danu-dev/toko-kita](https://github.com/danu-dev/toko-kita)
+- **Live Production Vercel**: [https://toko-kita-phi.vercel.app](https://toko-kita-phi.vercel.app)
