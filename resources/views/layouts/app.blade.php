@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>@yield('title', 'Toko Kita — Marketplace Hyperlocal UMKM')</title>
+    <title>@yield('title', 'TokoKita. — Marketplace Hyperlocal UMKM')</title>
     <meta name="description" content="Platform belanja produk & kuliner UMKM lokal terdekat dengan pengiriman cepat dan transaksi aman.">
 
     <!-- Fonts: Plus Jakarta Sans, Inter, JetBrains Mono -->
@@ -27,16 +27,12 @@
     <nav class="bg-white/95 backdrop-blur-md border-b border-[#1E2723]/10 sticky top-0 z-40 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Logo & Brand -->
+                <!-- Logo & Brand (Text-only "TokoKita.") -->
                 <div class="flex items-center gap-6">
-                    <a href="{{ route('home') }}" class="flex items-center gap-2.5 group">
-                        <div class="w-10 h-10 rounded-2xl bg-[#0E9F6E] flex items-center justify-center text-white shadow-md shadow-[#0E9F6E]/20 group-hover:scale-105 transition">
-                            <i data-lucide="store" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <span class="font-display font-black text-xl tracking-tight text-[#0B5A45]">toko<span class="text-[#0E9F6E]">kita</span></span>
-                            <span class="hidden md:block text-[10px] text-gray-500 -mt-1 font-medium">Marketplace UMKM Lokal</span>
-                        </div>
+                    <a href="{{ route('home') }}" class="group py-1">
+                        <span class="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#0B5A45] group-hover:opacity-90 transition">
+                            Toko<span class="text-[#0E9F6E]">Kita</span><span class="text-[#F2A93B]">.</span>
+                        </span>
                     </a>
 
                     <!-- Interactive "Kirim ke" Location Selector Button -->
@@ -285,12 +281,7 @@
     <footer class="bg-[#0B5A45] text-white mt-16 pt-12 pb-8 border-t border-emerald-900 hidden md:block">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div class="space-y-3">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-xl bg-[#0E9F6E] flex items-center justify-center text-white">
-                        <i data-lucide="store" class="w-5 h-5"></i>
-                    </div>
-                    <span class="font-display font-black text-xl text-white">toko<span class="text-[#F2A93B]">kita</span></span>
-                </div>
+                <span class="font-display font-black text-2xl text-white">Toko<span class="text-[#0E9F6E]">Kita</span><span class="text-[#F2A93B]">.</span></span>
                 <p class="text-sm text-emerald-100/70">
                     Platform hyperlocal yang menghubungkan UMKM warung, kuliner, dan kriya lokal dengan tetangga di sekitarnya.
                 </p>
@@ -322,7 +313,7 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-emerald-800/60 pt-6 text-center text-xs text-emerald-100/50">
-            &copy; 2026 Toko Kita Indonesia. Didesain untuk kemajuan UMKM Lokal.
+            &copy; 2026 TokoKita. Indonesia. Didesain untuk kemajuan UMKM Lokal.
         </div>
     </footer>
 

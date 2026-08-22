@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dashboard Mitra — Toko Kita')</title>
+    <title>@yield('title', 'Dashboard Mitra — TokoKita.')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,19 +17,14 @@
 </head>
 <body class="bg-[#FAF8F2] text-[#1E2723] min-h-screen flex antialiased">
 
-    <!-- Fixed Left Sidebar (Desktop - PRD Section 4.3 Deep Teal background) -->
+    <!-- Fixed Left Sidebar -->
     <aside class="w-64 bg-[#0B5A45] text-white flex-col justify-between hidden md:flex shrink-0 min-h-screen sticky top-0">
         <div>
             <!-- Brand -->
             <div class="p-6 border-b border-emerald-900/60">
-                <a href="{{ route('seller.dashboard') }}" class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-[#0E9F6E] flex items-center justify-center text-white shadow-md">
-                        <i data-lucide="store" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <span class="font-display font-black text-lg text-white">toko<span class="text-[#F2A93B]">kita</span></span>
-                        <span class="block text-[10px] text-emerald-200 uppercase tracking-wider font-semibold">Mitra Portal</span>
-                    </div>
+                <a href="{{ route('seller.dashboard') }}" class="group block">
+                    <span class="font-display font-black text-2xl text-white">Toko<span class="text-[#0E9F6E]">Kita</span><span class="text-[#F2A93B]">.</span></span>
+                    <span class="block text-[10px] text-emerald-200 uppercase tracking-wider font-semibold mt-0.5">Mitra Portal</span>
                 </a>
             </div>
 
@@ -86,7 +81,7 @@
         <div class="p-4 border-t border-emerald-900/60 space-y-2 text-xs">
             <a href="{{ route('home') }}" class="flex items-center gap-2 text-emerald-200 hover:text-white py-2 px-3 rounded-xl hover:bg-white/5 transition">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                <span>Kembali ke Toko Kita</span>
+                <span>Kembali ke TokoKita.</span>
             </a>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
@@ -101,7 +96,6 @@
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0">
         
-        <!-- Seller Top Bar -->
         <header class="bg-white border-b border-gray-100 px-6 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-xs">
             <div class="flex items-center gap-3">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#0E9F6E] animate-ping"></span>

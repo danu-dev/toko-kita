@@ -4,20 +4,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-putenv('APP_ENV=production');
-putenv('APP_DEBUG=false');
-putenv('LOG_CHANNEL=stderr');
-putenv('VIEW_COMPILED_PATH=/tmp/framework/views');
-putenv('SESSION_DRIVER=cookie');
-putenv('CACHE_STORE=array');
-putenv('DB_CONNECTION=sqlite');
-putenv('DB_DATABASE=/tmp/database.sqlite');
-putenv('APP_PACKAGES_CACHE=/tmp/packages.php');
-putenv('APP_SERVICES_CACHE=/tmp/services.php');
-putenv('APP_CONFIG_CACHE=/tmp/config.php');
-putenv('APP_ROUTES_CACHE=/tmp/routes.php');
-putenv('APP_EVENTS_CACHE=/tmp/events.php');
-
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -34,7 +20,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })->create();
 
-$app->useStoragePath('/tmp');
-$app->useBootstrapPath('/tmp');
+if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL'])) {
+    $app->useStoragePath('/tmp');
+    $app->useBootstrapPath('/tmp');
+}
 
 return $app;

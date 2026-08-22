@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin Operations — Toko Kita')</title>
+    <title>@yield('title', 'Admin Operations — TokoKita.')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,14 +21,9 @@
         <div>
             <!-- Brand -->
             <div class="p-6 border-b border-emerald-900/60">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-red-500 flex items-center justify-center text-white shadow-md">
-                        <i data-lucide="shield-check" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <span class="font-display font-black text-lg text-white">toko<span class="text-[#F2A93B]">kita</span></span>
-                        <span class="block text-[10px] text-red-300 uppercase tracking-wider font-bold">Admin Central</span>
-                    </div>
+                <a href="{{ route('admin.dashboard') }}" class="group block">
+                    <span class="font-display font-black text-2xl text-white">Toko<span class="text-[#0E9F6E]">Kita</span><span class="text-[#F2A93B]">.</span></span>
+                    <span class="block text-[10px] text-red-300 uppercase tracking-wider font-bold mt-0.5">Admin Central</span>
                 </a>
             </div>
 
