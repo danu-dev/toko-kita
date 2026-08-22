@@ -99,10 +99,22 @@
                             @endif
                         </div>
 
-                        <a href="{{ route('orders.track', $order->id) }}" class="bg-[#FAF8F2] hover:bg-[#0E9F6E] text-[#0B5A45] hover:text-white font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 transition">
-                            <span>Lacak & Detail</span>
-                            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                        </a>
+                        <div class="flex items-center gap-2">
+                            @if($order->status === 'selesai')
+                                <form action="{{ route('orders.reorder', $order->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="bg-emerald-50 hover:bg-[#0E9F6E] text-[#0B5A45] hover:text-white font-bold px-3 py-2 rounded-xl flex items-center gap-1 transition" title="Pesan Ulang Menu Ini">
+                                        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+                                        <span>Pesan Ulang</span>
+                                    </button>
+                                </form>
+                            @endif
+
+                            <a href="{{ route('orders.track', $order->id) }}" class="bg-[#FAF8F2] hover:bg-[#0E9F6E] text-[#0B5A45] hover:text-white font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 transition">
+                                <span>Lacak & Detail</span>
+                                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                            </a>
+                        </div>
                     </div>
 
                 </div>

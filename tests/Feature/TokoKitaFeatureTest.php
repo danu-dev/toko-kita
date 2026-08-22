@@ -479,6 +479,46 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertSee('Makanannya enak sekali', false);
         $response->assertSee('Terima kasih banyak atas pesanannya kak!', false);
     }
+
+    public function test_buyer_can_reorder_completed_order()
+    {
+        $buyer = User::where('email', 'buyer@tokokita.id')->first();
+        $store = Store::where('slug', 'warung-nasi-bu-siti')->first();
+        $product = Product::where('store_id', $store->id)->first();
+
+        $order = Order::create([
+            'order_number' => 'TK-TEST-REORDER01',
+            'buyer_id' => $buyer->id,
+            'store_id' => $store->id,
+            'fulfillment_type' => 'delivery',
+            'subtotal' => $product->price * 2,
+            'delivery_fee' => 8000,
+            'service_fee' => 1000,
+            'discount_amount' => 0,
+            'commission_fee' => 1500,
+            'seller_earnings' => ($product->price * 2) - 1500,
+            'total' => ($product->price * 2) + 9000,
+            'status' => 'selesai',
+        ]);
+
+        \App\Models\OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'price' => $product->price,
+            'quantity' => 2,
+            'subtotal' => $product->price * 2,
+        ]);
+
+        $this->actingAs($buyer);
+        $response = $this->post(route('orders.reorder', $order->id));
+        $response->assertRedirect(route('cart'));
+
+        $this->assertDatabaseHas('cart_items', [
+            'product_id' => $product->id,
+            'quantity' => 2,
+        ]);
+    }
 }
 
 

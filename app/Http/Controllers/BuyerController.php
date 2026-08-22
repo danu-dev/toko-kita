@@ -344,6 +344,52 @@ class BuyerController extends Controller
         return view('buyer.order-invoice', compact('order'));
     }
 
+    public function reorder(int $id)
+    {
+        $order = Order::with('items.product')->where('buyer_id', Auth::id())->findOrFail($id);
+
+        if (Auth::user()->store && Auth::user()->store->id === $order->store_id) {
+            return back()->with('error', 'Anda tidak dapat membeli dari toko Anda sendiri.');
+        }
+
+        $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
+        $addedCount = 0;
+
+        foreach ($order->items as $item) {
+            $product = $item->product;
+            if (!$product || !$product->is_active || $product->stock < 1) {
+                continue;
+            }
+
+            $qtyToAdd = min($item->quantity, $product->stock);
+
+            $cartItem = CartItem::where('cart_id', $cart->id)
+                ->where('product_id', $product->id)
+                ->where('product_variant_id', $item->product_variant_id)
+                ->first();
+
+            if ($cartItem) {
+                $cartItem->quantity = min($cartItem->quantity + $qtyToAdd, $product->stock);
+                $cartItem->save();
+            } else {
+                CartItem::create([
+                    'cart_id' => $cart->id,
+                    'product_id' => $product->id,
+                    'product_variant_id' => $item->product_variant_id,
+                    'quantity' => $qtyToAdd,
+                    'notes' => $item->notes,
+                ]);
+            }
+            $addedCount++;
+        }
+
+        if ($addedCount === 0) {
+            return back()->with('error', 'Semua menu dalam riwayat pesanan ini sedang habis atau tidak aktif.');
+        }
+
+        return redirect()->route('cart')->with('success', "Berhasil menambahkan {$addedCount} menu ke keranjang!");
+    }
+
     public function cancelOrder(Request $request, int $id)
     {
         $order = Order::where('buyer_id', Auth::id())->findOrFail($id);
