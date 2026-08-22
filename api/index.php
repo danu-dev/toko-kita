@@ -1,9 +1,8 @@
 <?php
 
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 
-// Set serverless env
+// Force serverless env variables
 putenv('APP_ENV=production');
 putenv('APP_DEBUG=false');
 putenv('LOG_CHANNEL=stderr');
@@ -14,17 +13,23 @@ putenv('DB_CONNECTION=sqlite');
 putenv('DB_DATABASE=/tmp/database.sqlite');
 putenv('APP_PACKAGES_CACHE=/tmp/packages.php');
 putenv('APP_SERVICES_CACHE=/tmp/services.php');
+putenv('APP_CONFIG_CACHE=/tmp/config.php');
+putenv('APP_ROUTES_CACHE=/tmp/routes.php');
+putenv('APP_EVENTS_CACHE=/tmp/events.php');
 
-$_ENV['VIEW_COMPILED_PATH'] = '/tmp/framework/views';
 $_ENV['APP_ENV'] = 'production';
 $_ENV['APP_DEBUG'] = 'false';
 $_ENV['LOG_CHANNEL'] = 'stderr';
+$_ENV['VIEW_COMPILED_PATH'] = '/tmp/framework/views';
 $_ENV['SESSION_DRIVER'] = 'cookie';
 $_ENV['CACHE_STORE'] = 'array';
 $_ENV['DB_CONNECTION'] = 'sqlite';
 $_ENV['DB_DATABASE'] = '/tmp/database.sqlite';
 $_ENV['APP_PACKAGES_CACHE'] = '/tmp/packages.php';
 $_ENV['APP_SERVICES_CACHE'] = '/tmp/services.php';
+$_ENV['APP_CONFIG_CACHE'] = '/tmp/config.php';
+$_ENV['APP_ROUTES_CACHE'] = '/tmp/routes.php';
+$_ENV['APP_EVENTS_CACHE'] = '/tmp/events.php';
 
 $dirs = [
     '/tmp/framework/views',
@@ -68,8 +73,5 @@ $app = require __DIR__ . '/../bootstrap/app.php';
 $app->useStoragePath('/tmp');
 $app->useBootstrapPath('/tmp');
 
-$kernel = $app->make(Kernel::class);
-$request = Request::capture();
-$response = $kernel->handle($request);
-$response->send();
-$kernel->terminate($request, $response);
+// Clean handle
+$app->handleRequest(Request::capture());
