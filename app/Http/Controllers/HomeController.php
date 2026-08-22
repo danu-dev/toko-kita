@@ -53,6 +53,7 @@ class HomeController extends Controller
         $sort = $request->input('sort', 'latest'); // latest, price_asc, price_desc, rating, popular
         $minPrice = $request->input('min_price');
         $maxPrice = $request->input('max_price');
+        $minRating = $request->input('min_rating');
         $onlyPromo = $request->boolean('promo');
 
         $categories = Category::where('is_active', true)->get();
@@ -82,6 +83,10 @@ class HomeController extends Controller
 
         if ($maxPrice !== null && $maxPrice !== '') {
             $products->where('price', '<=', (float)$maxPrice);
+        }
+
+        if ($minRating !== null && $minRating !== '') {
+            $products->where('rating', '>=', (float)$minRating);
         }
 
         if ($onlyPromo) {
@@ -124,6 +129,7 @@ class HomeController extends Controller
             'sort',
             'minPrice',
             'maxPrice',
+            'minRating',
             'onlyPromo'
         ));
     }

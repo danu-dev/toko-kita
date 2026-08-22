@@ -31,13 +31,23 @@
                 </button>
             </div>
 
-            <!-- Price Range & Promo Quick Filter Bar -->
+            <!-- Price Range, Rating Star & Promo Quick Filter Bar -->
             <div class="flex flex-wrap items-center gap-3 pt-1 text-xs">
                 <div class="flex items-center gap-2">
                     <span class="text-gray-500 font-semibold">Rentang Harga:</span>
-                    <input type="number" name="min_price" value="{{ $minPrice }}" placeholder="Min (Rp)" class="w-28 px-3 py-1.5 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs focus:border-[#0E9F6E] focus:outline-none">
+                    <input type="number" name="min_price" value="{{ $minPrice }}" placeholder="Min (Rp)" class="w-24 sm:w-28 px-3 py-1.5 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs focus:border-[#0E9F6E] focus:outline-none">
                     <span class="text-gray-400">-</span>
-                    <input type="number" name="max_price" value="{{ $maxPrice }}" placeholder="Maks (Rp)" class="w-28 px-3 py-1.5 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs focus:border-[#0E9F6E] focus:outline-none">
+                    <input type="number" name="max_price" value="{{ $maxPrice }}" placeholder="Maks (Rp)" class="w-24 sm:w-28 px-3 py-1.5 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs focus:border-[#0E9F6E] focus:outline-none">
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <span class="text-gray-500 font-semibold">Rating:</span>
+                    <select name="min_rating" class="px-3 py-1.5 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs focus:border-[#0E9F6E] focus:outline-none">
+                        <option value="">Semua Bintang</option>
+                        <option value="4.5" {{ $minRating == '4.5' ? 'selected' : '' }}>⭐ 4.5+ ke atas</option>
+                        <option value="4.0" {{ $minRating == '4.0' ? 'selected' : '' }}>⭐ 4.0+ ke atas</option>
+                        <option value="3.0" {{ $minRating == '3.0' ? 'selected' : '' }}>⭐ 3.0+ ke atas</option>
+                    </select>
                 </div>
 
                 <label class="inline-flex items-center gap-2 cursor-pointer bg-[#FAF8F2] hover:bg-[#F2EFE9] px-3 py-1.5 rounded-xl border border-gray-200 select-none">
@@ -47,7 +57,7 @@
                     </span>
                 </label>
 
-                @if($query || $categoryId || $minPrice || $maxPrice || $onlyPromo || ($sort && $sort !== 'latest'))
+                @if($query || $categoryId || $minPrice || $maxPrice || $minRating || $onlyPromo || ($sort && $sort !== 'latest'))
                     <a href="{{ route('explore') }}" class="text-red-500 hover:underline font-semibold ml-auto">
                         Reset Filter
                     </a>
