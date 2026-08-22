@@ -82,6 +82,35 @@
 
     </div>
 
+    <!-- Low Stock Inventory Alert Box -->
+    @if(isset($lowStockProducts) && $lowStockProducts->isNotEmpty())
+        <div class="bg-red-50 border border-red-200 p-5 rounded-3xl space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5 text-red-800">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 shrink-0"></i>
+                    <h3 class="font-display font-bold text-sm">Peringatan: Stok Menu / Produk Menipis (<= 3)</h3>
+                </div>
+                <a href="{{ route('seller.products', ['status' => 'out_of_stock']) }}" class="text-xs text-red-700 font-bold hover:underline">Kelola Stok &rarr;</a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+                @foreach($lowStockProducts as $lowP)
+                    <div class="bg-white p-3 rounded-2xl border border-red-100 flex items-center justify-between shadow-xs">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <img src="{{ $lowP->image ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=80' }}" class="w-10 h-10 rounded-xl object-cover border border-gray-100 shrink-0">
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-xs text-gray-800 truncate">{{ $lowP->name }}</h4>
+                                <span class="text-[10px] text-red-600 font-bold block">Sisa {{ $lowP->stock }} {{ $lowP->unit }}</span>
+                            </div>
+                        </div>
+                        <a href="{{ route('seller.products.edit', $lowP->id) }}" class="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg text-xs transition">
+                            Restock
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <!-- Live Incoming Orders Alert Box (PRD Section 3.2 - Real-time incoming order sound/action) -->
     @if($incomingOrders->isNotEmpty())
         <div class="bg-[#FEF9EE] p-6 rounded-3xl border-2 border-[#F2A93B] shadow-lg space-y-4 animate-pulse">

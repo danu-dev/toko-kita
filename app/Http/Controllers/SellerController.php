@@ -61,7 +61,14 @@ class SellerController extends Controller
 
         $wallet = Wallet::firstOrCreate(['store_id' => $store->id]);
 
-        return view('seller.dashboard', compact('store', 'totalOrders', 'activeOrders', 'completedOrders', 'totalRevenue', 'incomingOrders', 'recentOrders', 'wallet'));
+        // Low stock alerts (products with stock <= 3)
+        $lowStockProducts = Product::where('store_id', $store->id)
+            ->where('is_active', true)
+            ->where('stock', '<=', 3)
+            ->orderBy('stock', 'asc')
+            ->get();
+
+        return view('seller.dashboard', compact('store', 'totalOrders', 'activeOrders', 'completedOrders', 'totalRevenue', 'incomingOrders', 'recentOrders', 'wallet', 'lowStockProducts'));
     }
 
     public function orders(Request $request)

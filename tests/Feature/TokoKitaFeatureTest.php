@@ -556,6 +556,23 @@ class TokoKitaFeatureTest extends TestCase
         $statusRes->assertStatus(200);
         $statusRes->assertViewHas('status', 'active');
     }
+
+    public function test_seller_dashboard_displays_low_stock_inventory_alerts()
+    {
+        $seller = User::where('email', 'seller@tokokita.id')->first();
+        $store = Store::where('user_id', $seller->id)->first();
+
+        // Create or update a product with low stock (<= 3)
+        $product = Product::where('store_id', $store->id)->first();
+        $product->stock = 2;
+        $product->save();
+
+        $this->actingAs($seller);
+        $response = $this->get(route('seller.dashboard'));
+        $response->assertStatus(200);
+        $response->assertSee('Peringatan: Stok Menu / Produk Menipis', false);
+        $response->assertSee('Sisa 2');
+    }
 }
 
 
