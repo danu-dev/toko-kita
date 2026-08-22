@@ -1,9 +1,13 @@
 <?php
 
-putenv('VIEW_COMPILED_PATH=/tmp/framework/views');
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\Request;
+
+// Set serverless env
 putenv('APP_ENV=production');
-putenv('APP_DEBUG=false');
+putenv('APP_DEBUG=true');
 putenv('LOG_CHANNEL=stderr');
+putenv('VIEW_COMPILED_PATH=/tmp/framework/views');
 putenv('SESSION_DRIVER=cookie');
 putenv('CACHE_STORE=array');
 putenv('DB_CONNECTION=sqlite');
@@ -13,7 +17,7 @@ putenv('APP_SERVICES_CACHE=/tmp/services.php');
 
 $_ENV['VIEW_COMPILED_PATH'] = '/tmp/framework/views';
 $_ENV['APP_ENV'] = 'production';
-$_ENV['APP_DEBUG'] = 'false';
+$_ENV['APP_DEBUG'] = 'true';
 $_ENV['LOG_CHANNEL'] = 'stderr';
 $_ENV['SESSION_DRIVER'] = 'cookie';
 $_ENV['CACHE_STORE'] = 'array';
@@ -64,4 +68,20 @@ $app = require __DIR__ . '/../bootstrap/app.php';
 $app->useStoragePath('/tmp');
 $app->useBootstrapPath('/tmp');
 
-$app->handleRequest(\Illuminate\Http\Request::capture());
+try {
+    $kernel = $app->make(Kernel::class);
+    $request = Request::capture();
+    $response = $kernel->handle($request);
+    $response->send();
+    $kernel->terminate($request, $response);
+} catch (\Throwable $e) {
+    http_response_code(200);
+    header('Content-Type: text/html');
+    echo '<div style="background:#111;color:#ff5555;padding:30px;font-family:monospace;white-space:pre-wrap;font-size:14px;">';
+    echo "<h1>EXCEPTION CAUGHT ON SERVERLESS ENTRY</h1>\n";
+    echo "<b>Exception:</b> " . get_class($e) . "\n";
+    echo "<b>Message:</b> " . $e->getMessage() . "\n";
+    echo "<b>File:</b> " . $e->getFile() . " : line " . $e->getLine() . "\n\n";
+    echo "<b>Trace:</b>\n" . $e->getTraceAsString();
+    echo '</div>';
+}
