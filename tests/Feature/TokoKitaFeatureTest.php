@@ -321,6 +321,13 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertSee('Struk Digital');
         $response->assertSee($order->order_number);
         $response->assertSee($order->store->name);
+
+        // Seller also can view invoice/kitchen receipt
+        $seller = User::where('id', $store->user_id)->first();
+        $this->actingAs($seller);
+        $sellerInvoiceRes = $this->get(route('orders.invoice', $order->id));
+        $sellerInvoiceRes->assertStatus(200);
+        $sellerInvoiceRes->assertSee('Struk Digital');
     }
 
     public function test_store_open_status_displayed()

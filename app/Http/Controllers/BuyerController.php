@@ -338,7 +338,10 @@ class BuyerController extends Controller
     public function invoiceView(int $id)
     {
         $order = Order::with(['store.user', 'items.product', 'payment', 'address', 'buyer'])
-            ->where('buyer_id', Auth::id())
+            ->where(function($q) {
+                $q->where('buyer_id', Auth::id())
+                  ->orWhereHas('store', fn($sq) => $sq->where('user_id', Auth::id()));
+            })
             ->findOrFail($id);
 
         return view('buyer.order-invoice', compact('order'));

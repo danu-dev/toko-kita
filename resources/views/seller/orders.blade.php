@@ -74,6 +74,11 @@
 
                         <!-- Action Buttons by State -->
                         <div class="flex items-center gap-2">
+                            <!-- Struk / Invoice View -->
+                            <a href="{{ route('orders.invoice', $order->id) }}" target="_blank" class="p-2 rounded-xl bg-[#FAF8F2] hover:bg-emerald-50 text-gray-700 hover:text-[#0B5A45] border border-gray-200 transition" title="Lihat & Cetak Struk Dapur / Nota">
+                                <i data-lucide="printer" class="w-4 h-4"></i>
+                            </a>
+
                             <!-- Direct Chat Buyer Button -->
                             <a href="{{ route('chats.show', \App\Models\Chat::firstOrCreate(['buyer_id' => $order->buyer_id, 'store_id' => $order->store_id])->id) }}" class="p-2 rounded-xl bg-[#FAF8F2] hover:bg-emerald-50 text-[#0B5A45] border border-gray-200 transition" title="Chat Pembeli">
                                 <i data-lucide="message-square" class="w-4 h-4"></i>
