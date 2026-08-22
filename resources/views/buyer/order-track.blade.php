@@ -203,7 +203,13 @@
 
     <!-- Order Items & Invoice Details -->
     <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
-        <h3 class="font-display font-bold text-base text-[#0B5A45]">Rincian Transaksi & Struk Digital</h3>
+        <div class="flex items-center justify-between">
+            <h3 class="font-display font-bold text-base text-[#0B5A45]">Rincian Transaksi & Struk Digital</h3>
+            <a href="{{ route('orders.invoice', $order->id) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#0B5A45] hover:text-[#0E9F6E] bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-xl border border-emerald-200 transition">
+                <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+                <span>Lihat Struk / Invoice</span>
+            </a>
+        </div>
 
         <div class="divide-y divide-gray-100 text-xs">
             @foreach($order->items as $item)

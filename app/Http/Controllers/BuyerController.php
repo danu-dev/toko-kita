@@ -329,6 +329,15 @@ class BuyerController extends Controller
         return view('buyer.order-track', compact('order'));
     }
 
+    public function invoiceView(int $id)
+    {
+        $order = Order::with(['store.user', 'items.product', 'payment', 'address', 'buyer'])
+            ->where('buyer_id', Auth::id())
+            ->findOrFail($id);
+
+        return view('buyer.order-invoice', compact('order'));
+    }
+
     public function cancelOrder(Request $request, int $id)
     {
         $order = Order::where('buyer_id', Auth::id())->findOrFail($id);

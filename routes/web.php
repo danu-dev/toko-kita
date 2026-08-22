@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
     // Orders, Tracking & Status Pulse
     Route::get('/pesanan', [BuyerController::class, 'ordersIndex'])->name('orders.index');
     Route::get('/pesanan/{id}/lacak', [BuyerController::class, 'trackOrder'])->name('orders.track');
+    Route::get('/pesanan/{id}/invoice', [BuyerController::class, 'invoiceView'])->name('orders.invoice');
     Route::post('/pesanan/{id}/batal', [BuyerController::class, 'cancelOrder'])->name('orders.cancel');
     Route::post('/pesanan/{id}/selesai', [BuyerController::class, 'completeOrder'])->name('orders.complete');
     Route::post('/pesanan/{id}/ulasan', [BuyerController::class, 'storeReview'])->name('orders.review');

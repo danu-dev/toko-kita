@@ -280,5 +280,37 @@ class TokoKitaFeatureTest extends TestCase
             'store_id' => $store->id,
         ]);
     }
+
+    public function test_buyer_can_view_digital_invoice_and_receipt()
+    {
+        $buyer = User::where('email', 'buyer@tokokita.id')->first();
+        $store = Store::where('slug', 'warung-nasi-bu-siti')->first();
+
+        $order = Order::where('buyer_id', $buyer->id)->first();
+        if (!$order) {
+            $order = Order::create([
+                'order_number' => 'TK-TEST-INV01',
+                'buyer_id' => $buyer->id,
+                'store_id' => $store->id,
+                'fulfillment_type' => 'pickup',
+                'subtotal' => 50000,
+                'delivery_fee' => 0,
+                'service_fee' => 1000,
+                'discount_amount' => 0,
+                'commission_fee' => 5000,
+                'seller_earnings' => 45000,
+                'total' => 51000,
+                'status' => 'selesai',
+            ]);
+        }
+
+        $this->actingAs($buyer);
+
+        $response = $this->get(route('orders.invoice', $order->id));
+        $response->assertStatus(200);
+        $response->assertSee('Struk Digital');
+        $response->assertSee($order->order_number);
+        $response->assertSee($order->store->name);
+    }
 }
 
