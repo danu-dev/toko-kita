@@ -357,5 +357,20 @@ class TokoKitaFeatureTest extends TestCase
         $deleteRes->assertRedirect();
         $this->assertDatabaseMissing('coupons', ['id' => $coupon->id]);
     }
+
+    public function test_seller_can_toggle_product_status()
+    {
+        $seller = User::where('email', 'seller@tokokita.id')->first();
+        $store = Store::where('user_id', $seller->id)->first();
+        $product = Product::where('store_id', $store->id)->first();
+
+        $this->actingAs($seller);
+
+        $initialStatus = $product->is_active;
+        $response = $this->post(route('seller.products.toggle', $product->id));
+        $response->assertRedirect();
+
+        $this->assertEquals(!$initialStatus, $product->fresh()->is_active);
+    }
 }
 

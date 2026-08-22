@@ -45,19 +45,22 @@
                 @endif
 
                 <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-xs">
-                    <span class="inline-flex items-center gap-1 text-[11px] {{ $prod->is_active ? 'text-[#0E9F6E] font-bold' : 'text-gray-400' }}">
-                        <span class="w-2 h-2 rounded-full {{ $prod->is_active ? 'bg-[#0E9F6E]' : 'bg-gray-400' }}"></span>
-                        {{ $prod->is_active ? 'Aktif Dijual' : 'Nonaktif' }}
-                    </span>
+                    <form action="{{ route('seller.products.toggle', $prod->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-1 rounded-lg border transition {{ $prod->is_active ? 'bg-emerald-50 text-[#0E9F6E] border-emerald-200 hover:bg-emerald-100' : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100' }}">
+                            <span class="w-2 h-2 rounded-full {{ $prod->is_active ? 'bg-[#0E9F6E]' : 'bg-gray-400' }}"></span>
+                            <span>{{ $prod->is_active ? 'Aktif Dijual' : 'Nonaktif' }}</span>
+                        </button>
+                    </form>
 
                     <div class="flex items-center gap-2">
-                        <a href="{{ route('seller.products.edit', $prod->id) }}" class="p-2 rounded-xl bg-[#FAF8F2] hover:bg-gray-200 text-gray-700 transition">
+                        <a href="{{ route('seller.products.edit', $prod->id) }}" class="p-2 rounded-xl bg-[#FAF8F2] hover:bg-gray-200 text-gray-700 transition" title="Edit Produk">
                             <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                         </a>
                         <form action="{{ route('seller.products.delete', $prod->id) }}" method="POST" onsubmit="return confirm('Hapus produk ini?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition">
+                            <button type="submit" class="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition" title="Hapus Produk">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                             </button>
                         </form>

@@ -73,6 +73,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('mitra')->name('seller.')->gr
     Route::post('/produk', [SellerController::class, 'storeProduct'])->name('products.store');
     Route::get('/produk/{id}/edit', [SellerController::class, 'editProduct'])->name('products.edit');
     Route::put('/produk/{id}', [SellerController::class, 'updateProduct'])->name('products.update');
+    Route::post('/produk/{id}/toggle', [SellerController::class, 'toggleProductStatus'])->name('products.toggle');
     Route::delete('/produk/{id}', [SellerController::class, 'deleteProduct'])->name('products.delete');
 
     Route::get('/dompet', [SellerController::class, 'wallet'])->name('wallet');

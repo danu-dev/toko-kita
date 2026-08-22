@@ -242,6 +242,16 @@ class SellerController extends Controller
         return back()->with('success', 'Produk berhasil dihapus.');
     }
 
+    public function toggleProductStatus(int $id)
+    {
+        $store = $this->getStore();
+        $product = Product::where('store_id', $store->id)->findOrFail($id);
+        $product->update(['is_active' => !$product->is_active]);
+
+        $statusText = $product->is_active ? 'diaktifkan untuk dijual' : 'dinonaktifkan (disembunyikan dari katalog)';
+        return back()->with('success', "Produk '{$product->name}' berhasil {$statusText}.");
+    }
+
     // WALLET & WITHDRAWAL
     public function wallet()
     {
