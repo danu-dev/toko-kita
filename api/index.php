@@ -1,8 +1,13 @@
 <?php
 
-use Illuminate\Http\Request;
+// Direct serverless bootstrap
+$_ENV['APP_CONFIG_CACHE'] = '/tmp/config.php';
+$_ENV['APP_EVENTS_CACHE'] = '/tmp/events.php';
+$_ENV['APP_PACKAGES_CACHE'] = '/tmp/packages.php';
+$_ENV['APP_ROUTES_CACHE'] = '/tmp/routes.php';
+$_ENV['APP_SERVICES_CACHE'] = '/tmp/services.php';
+$_ENV['VIEW_COMPILED_PATH'] = '/tmp/views';
 
-// Ensure writable directories in Vercel /tmp
 $dirs = [
     '/tmp/views',
     '/tmp/framework/sessions',
@@ -14,6 +19,15 @@ $dirs = [
 foreach ($dirs as $dir) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0777, true);
+    }
+}
+
+// Copy pre-compiled bootstrap cache files to /tmp so Laravel doesn't write to read-only disk
+$cachedFiles = ['packages.php', 'services.php', 'config.php', 'routes-v7.php'];
+foreach ($cachedFiles as $file) {
+    $src = __DIR__ . '/../bootstrap/cache/' . $file;
+    if (file_exists($src)) {
+        @copy($src, '/tmp/' . $file);
     }
 }
 
@@ -33,4 +47,4 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $app = require __DIR__ . '/../bootstrap/app.php';
 
-$app->handleRequest(Request::capture());
+$app->handleRequest(\Illuminate\Http\Request::capture());
