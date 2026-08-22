@@ -1,8 +1,7 @@
 <?php
 
-// Direct serverless env mappings for Vercel
 putenv('APP_ENV=production');
-putenv('APP_DEBUG=false');
+putenv('APP_DEBUG=true');
 putenv('LOG_CHANNEL=stderr');
 putenv('VIEW_COMPILED_PATH=/tmp/views');
 putenv('DB_CONNECTION=sqlite');
@@ -11,7 +10,7 @@ putenv('SESSION_DRIVER=cookie');
 putenv('CACHE_STORE=array');
 
 $_ENV['APP_ENV'] = 'production';
-$_ENV['APP_DEBUG'] = 'false';
+$_ENV['APP_DEBUG'] = 'true';
 $_ENV['LOG_CHANNEL'] = 'stderr';
 $_ENV['VIEW_COMPILED_PATH'] = '/tmp/views';
 $_ENV['DB_CONNECTION'] = 'sqlite';
