@@ -120,5 +120,47 @@
         </div>
     @endif
 
+    <!-- Recommended / Trending Products Grid -->
+    @if(isset($recommendedProducts) && $recommendedProducts->isNotEmpty())
+        <div class="bg-white p-6 sm:p-7 rounded-3xl border border-gray-100 shadow-sm space-y-4 pt-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-display font-bold text-base text-[#0B5A45] flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-[#F2A93B]"></i>
+                        <span>Rekomendasi Menu Favorit Tetangga</span>
+                    </h3>
+                    <p class="text-xs text-gray-500">Mungkin Anda juga ingin menambahkan hidangan lezat ini ke pesanan.</p>
+                </div>
+                <a href="{{ route('explore') }}" class="text-xs text-[#0E9F6E] font-bold hover:underline">
+                    Lihat Semua &rarr;
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                @foreach($recommendedProducts as $rec)
+                    <div class="bg-[#FAF8F2] rounded-2xl p-2.5 border border-gray-100 hover:border-[#0E9F6E] transition group flex flex-col justify-between">
+                        <div>
+                            <a href="{{ route('products.show', $rec->slug) }}" class="relative aspect-square w-full rounded-xl overflow-hidden bg-gray-100 block mb-2">
+                                <img src="{{ $rec->image ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80' }}" class="w-full h-full object-cover group-hover:scale-105 transition">
+                            </a>
+                            <span class="text-[10px] text-gray-400 font-semibold block truncate">{{ $rec->store->name }}</span>
+                            <a href="{{ route('products.show', $rec->slug) }}" class="font-display font-bold text-xs text-[#1E2723] group-hover:text-[#0E9F6E] transition line-clamp-1 mt-0.5">
+                                {{ $rec->name }}
+                            </a>
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-gray-200/60 flex items-center justify-between">
+                            <span class="font-mono font-bold text-xs text-[#0B5A45]">
+                                Rp {{ number_format($rec->price, 0, ',', '.') }}
+                            </span>
+                            <a href="{{ route('products.show', $rec->slug) }}" class="p-1.5 rounded-lg bg-white group-hover:bg-[#0E9F6E] text-gray-600 group-hover:text-white shadow-xs transition" title="Lihat Menu">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
 </div>
 @endsection

@@ -582,6 +582,16 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertSee('Pertanyaan Sering Ditanyakan (FAQ)', false);
         $response->assertSee('Rekening Bersama', false);
     }
+
+    public function test_cart_page_displays_recommendations_grid()
+    {
+        $buyer = User::where('email', 'buyer@tokokita.id')->first();
+        $this->actingAs($buyer);
+
+        $response = $this->get(route('cart'));
+        $response->assertStatus(200);
+        $response->assertSee('Rekomendasi Menu Favorit Tetangga', false);
+    }
 }
 
 

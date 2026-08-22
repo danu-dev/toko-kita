@@ -52,7 +52,16 @@ class BuyerController extends Controller
 
         $groupedCart = $items->groupBy(fn($item) => $item->product->store_id);
 
-        return view('buyer.cart', compact('groupedCart', 'items'));
+        // Quick Recommendations / Trending items
+        $recommendedProducts = Product::with(['store', 'category'])
+            ->where('is_active', true)
+            ->where('stock', '>', 0)
+            ->whereHas('store', fn($q) => $q->where('status', 'approved')->where('is_open', true))
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
+
+        return view('buyer.cart', compact('groupedCart', 'items', 'recommendedProducts'));
     }
 
     public function addToCart(Request $request)
