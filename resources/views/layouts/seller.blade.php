@@ -106,6 +106,17 @@
             </div>
 
             <div class="flex items-center gap-3">
+                <!-- Quick Store Open/Close Toggle Button -->
+                @if(Auth::user()->store)
+                    <form action="{{ route('seller.toggle-status') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="text-xs px-3 py-1.5 rounded-xl font-bold border flex items-center gap-1.5 transition {{ Auth::user()->store->is_open ? 'bg-emerald-50 text-[#0E9F6E] border-emerald-200 hover:bg-emerald-100' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' }}">
+                            <span class="w-2 h-2 rounded-full {{ Auth::user()->store->is_open ? 'bg-[#0E9F6E] animate-pulse' : 'bg-red-500' }}"></span>
+                            <span>{{ Auth::user()->store->is_open ? 'Toko Buka' : 'Toko Tutup' }}</span>
+                        </button>
+                    </form>
+                @endif
+
                 <a href="{{ route('stores.show', Auth::user()->store?->slug ?? '') }}" target="_blank" class="text-xs bg-[#FAF8F2] hover:bg-[#0E9F6E] hover:text-white px-3.5 py-1.5 rounded-xl font-bold border border-gray-200 flex items-center gap-1.5 transition">
                     <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                     <span>Lihat Toko Publik</span>

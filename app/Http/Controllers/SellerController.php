@@ -460,4 +460,14 @@ class SellerController extends Controller
 
         return back()->with('success', 'Pengaturan toko berhasil diperbarui.');
     }
+
+    public function toggleStoreOpenStatus()
+    {
+        $store = $this->getStore();
+        $store->is_open = !$store->is_open;
+        $store->save();
+
+        $statusText = $store->is_open ? 'Buka (Menerima Pesanan)' : 'Tutup Sementara';
+        return back()->with('success', "Status toko berhasil diubah menjadi: {$statusText}");
+    }
 }

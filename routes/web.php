@@ -85,6 +85,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('mitra')->name('seller.')->gr
 
     Route::get('/pengaturan', [SellerController::class, 'settings'])->name('settings');
     Route::put('/pengaturan', [SellerController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/toggle-status-toko', [SellerController::class, 'toggleStoreOpenStatus'])->name('toggle-status');
 });
 
 // Admin Operations Routes - Strict Platform Oversight Boundary

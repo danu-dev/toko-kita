@@ -443,6 +443,20 @@ class TokoKitaFeatureTest extends TestCase
         $trackRes->assertSee('Estimasi Waktu Tiba (SLA)');
         $trackRes->assertSee('~25 menit');
     }
+
+    public function test_seller_can_quick_toggle_store_open_status()
+    {
+        $seller = User::where('email', 'seller@tokokita.id')->first();
+        $store = Store::where('user_id', $seller->id)->first();
+        $initialStatus = $store->is_open;
+
+        $this->actingAs($seller);
+        $response = $this->post(route('seller.toggle-status'));
+        $response->assertRedirect();
+
+        $this->assertEquals(!$initialStatus, $store->fresh()->is_open);
+    }
 }
+
 
 
