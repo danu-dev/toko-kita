@@ -17,16 +17,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (\Throwable $e, $request) {
-            header('HTTP/1.1 200 OK', true, 200);
-            header('Content-Type: text/plain; charset=utf-8');
-            echo "LARAVEL RAW EXCEPTION DEBUG:\n";
-            echo "Type: " . get_class($e) . "\n";
-            echo "Message: " . $e->getMessage() . "\n";
-            echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n\n";
-            echo "Trace:\n" . $e->getTraceAsString();
-            exit;
-        });
+        //
     })->create();
 
 if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL']) || env('APP_ENV') === 'production') {
