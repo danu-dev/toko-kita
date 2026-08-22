@@ -90,8 +90,13 @@
 
                     <!-- Bottom Actions Bar -->
                     <div class="flex items-center justify-between pt-3 border-t border-gray-100 text-xs">
-                        <div class="text-[11px] text-gray-500">
-                            Metode: <b class="uppercase">{{ $order->payment?->method ?? 'QRIS' }}</b> ({{ $order->fulfillment_type === 'delivery' ? 'Antar' : 'Pickup' }})
+                        <div class="text-[11px] text-gray-500 flex items-center gap-2">
+                            <span>Metode: <b class="uppercase">{{ $order->payment?->method ?? 'QRIS' }}</b> ({{ $order->fulfillment_type === 'delivery' ? 'Antar' : 'Pickup' }})</span>
+                            @if($order->estimated_delivery_minutes && in_array($order->status, ['diproses', 'siap_diambil_dikirim']))
+                                <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <i data-lucide="timer" class="w-3 h-3"></i> ~{{ $order->estimated_delivery_minutes }} mnt
+                                </span>
+                            @endif
                         </div>
 
                         <a href="{{ route('orders.track', $order->id) }}" class="bg-[#FAF8F2] hover:bg-[#0E9F6E] text-[#0B5A45] hover:text-white font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 transition">

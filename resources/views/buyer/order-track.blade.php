@@ -75,6 +75,26 @@
                     @php $stepIdx++; @endphp
                 @endforeach
             </div>
+
+            @if($order->estimated_delivery_minutes && in_array($order->status, ['diproses', 'siap_diambil_dikirim']))
+                <div class="bg-[#EDFDF5] border border-emerald-200 rounded-2xl p-3.5 flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-[#0E9F6E] text-white flex items-center justify-center">
+                            <i data-lucide="timer" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-[#0B5A45] block">Estimasi Waktu Tiba (SLA)</span>
+                            <p class="text-gray-600 text-[11px]">Penjual memperkirakan pesanan selesai ~{{ $order->estimated_delivery_minutes }} menit</p>
+                        </div>
+                    </div>
+                    @if($order->estimated_delivery_at)
+                        <div class="text-right font-mono">
+                            <span class="text-[10px] text-gray-400 block">Target:</span>
+                            <span class="font-bold text-[#0B5A45] text-sm">{{ $order->estimated_delivery_at->format('H:i') }} WIB</span>
+                        </div>
+                    @endif
+                </div>
+            @endif
         @endif
 
         <!-- Audit Trail / History Logs (PRD Section 3.4) -->

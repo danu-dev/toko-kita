@@ -402,5 +402,47 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('title="Chat Pembeli"', false);
     }
+
+    public function test_seller_can_set_delivery_sla_and_buyer_sees_estimated_time()
+    {
+        $seller = User::where('email', 'seller@tokokita.id')->first();
+        $buyer = User::where('email', 'buyer@tokokita.id')->first();
+        $store = Store::where('user_id', $seller->id)->first();
+
+        $order = Order::create([
+            'order_number' => 'TK-TEST-SLA01',
+            'buyer_id' => $buyer->id,
+            'store_id' => $store->id,
+            'fulfillment_type' => 'delivery',
+            'subtotal' => 30000,
+            'delivery_fee' => 8000,
+            'service_fee' => 1000,
+            'discount_amount' => 0,
+            'commission_fee' => 1500,
+            'seller_earnings' => 28500,
+            'total' => 39000,
+            'status' => 'menunggu_konfirmasi',
+        ]);
+
+        $this->actingAs($seller);
+        $acceptRes = $this->post(route('seller.orders.status', $order->id), [
+            'action' => 'accept',
+            'estimated_minutes' => 25,
+        ]);
+        $acceptRes->assertRedirect();
+
+        $freshOrder = $order->fresh();
+        $this->assertEquals('diproses', $freshOrder->status);
+        $this->assertEquals(25, $freshOrder->estimated_delivery_minutes);
+        $this->assertNotNull($freshOrder->estimated_delivery_at);
+
+        // Buyer checks order track view
+        $this->actingAs($buyer);
+        $trackRes = $this->get(route('orders.track', $freshOrder->id));
+        $trackRes->assertStatus(200);
+        $trackRes->assertSee('Estimasi Waktu Tiba (SLA)');
+        $trackRes->assertSee('~25 menit');
+    }
 }
+
 

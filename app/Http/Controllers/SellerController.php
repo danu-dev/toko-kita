@@ -88,10 +88,16 @@ class SellerController extends Controller
 
         $action = $request->input('action'); // accept, ready, complete, reject
         $reason = $request->input('reason');
+        $estimatedMinutes = $request->input('estimated_minutes');
 
         try {
             if ($action === 'accept') {
-                $this->orderService->transition($order, OrderService::STATUS_DIPROSES, Auth::user(), 'Pesanan diterima penjual.');
+                if ($estimatedMinutes) {
+                    $order->estimated_delivery_minutes = (int) $estimatedMinutes;
+                    $order->estimated_delivery_at = now()->addMinutes((int) $estimatedMinutes);
+                    $order->save();
+                }
+                $this->orderService->transition($order, OrderService::STATUS_DIPROSES, Auth::user(), $estimatedMinutes ? 'Pesanan diterima penjual. Estimasi selesai: ' . $estimatedMinutes . ' menit.' : 'Pesanan diterima penjual.');
                 $msg = 'Pesanan diterima dan mulai diproses!';
             } elseif ($action === 'ready') {
                 $this->orderService->transition($order, OrderService::STATUS_SIAP, Auth::user(), 'Pesanan telah selesai disiapkan & siap diantar/diambil.');

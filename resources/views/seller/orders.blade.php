@@ -31,6 +31,11 @@
                         <span class="font-mono text-xs font-bold text-[#0B5A45] bg-[#EDFDF5] px-2.5 py-1 rounded-lg">{{ $order->order_number }}</span>
                         <span class="text-xs text-gray-400">• {{ $order->created_at->format('d M Y, H:i') }}</span>
                         <span class="bg-gray-100 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">{{ $order->fulfillment_type }}</span>
+                        @if($order->estimated_delivery_minutes)
+                            <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <i data-lucide="timer" class="w-3 h-3"></i> SLA: ~{{ $order->estimated_delivery_minutes }} mnt
+                            </span>
+                        @endif
                     </div>
 
                     <x-status-pulse :status="$order->status" />
@@ -75,17 +80,23 @@
                             </a>
 
                             @if($order->status === 'menunggu_konfirmasi')
-                                <form action="{{ route('seller.orders.status', $order->id) }}" method="POST">
+                                <form action="{{ route('seller.orders.status', $order->id) }}" method="POST" class="flex items-center gap-1.5">
                                     @csrf
                                     <input type="hidden" name="action" value="accept">
-                                    <button type="submit" class="bg-[#0E9F6E] hover:bg-[#086644] text-white font-bold px-4 py-2 rounded-xl text-xs shadow-sm transition">
-                                        Terima & Masak
+                                    <select name="estimated_minutes" class="text-xs bg-[#FAF8F2] border border-gray-200 rounded-xl px-2 py-1.5 focus:border-[#0E9F6E] focus:outline-none font-medium">
+                                        <option value="15">~15 mnt</option>
+                                        <option value="25" selected>~25 mnt</option>
+                                        <option value="40">~40 mnt</option>
+                                        <option value="60">~60 mnt</option>
+                                    </select>
+                                    <button type="submit" class="bg-[#0E9F6E] hover:bg-[#086644] text-white font-bold px-3.5 py-1.5 rounded-xl text-xs shadow-sm transition">
+                                        Terima
                                     </button>
                                 </form>
                                 <form action="{{ route('seller.orders.status', $order->id) }}" method="POST" onsubmit="return confirm('Tolak pesanan?');">
                                     @csrf
                                     <input type="hidden" name="action" value="reject">
-                                    <button type="submit" class="bg-red-50 text-red-600 font-bold px-3 py-2 rounded-xl text-xs">
+                                    <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold px-2.5 py-1.5 rounded-xl text-xs transition">
                                         Tolak
                                     </button>
                                 </form>
