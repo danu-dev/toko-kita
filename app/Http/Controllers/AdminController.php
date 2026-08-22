@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Withdrawal;
 use App\Models\Dispute;
 use App\Models\Banner;
+use App\Models\Coupon;
 use App\Models\PlatformSetting;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
@@ -210,7 +211,50 @@ class AdminController extends Controller
     {
         $commissionPercent = PlatformSetting::get('platform_commission_percent', 5);
         $banners = Banner::orderBy('order_position')->get();
-        return view('admin.settings', compact('commissionPercent', 'banners'));
+        $coupons = Coupon::latest()->get();
+        return view('admin.settings', compact('commissionPercent', 'banners', 'coupons'));
+    }
+
+    public function storeCoupon(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:30|unique:coupons,code',
+            'title' => 'required|string|max:255',
+            'type' => 'required|in:fixed,percent',
+            'discount_value' => 'required|numeric|min:1',
+            'min_order_amount' => 'required|numeric|min:0',
+            'max_discount' => 'nullable|numeric|min:0',
+            'expires_at' => 'nullable|date',
+        ]);
+
+        Coupon::create([
+            'code' => strtoupper($validated['code']),
+            'title' => $validated['title'],
+            'type' => $validated['type'],
+            'discount_value' => $validated['discount_value'],
+            'min_order_amount' => $validated['min_order_amount'],
+            'max_discount' => $validated['max_discount'] ?? null,
+            'expires_at' => $validated['expires_at'] ?? null,
+            'is_active' => true,
+        ]);
+
+        return back()->with('success', 'Kupon voucher promo baru berhasil diterbitkan!');
+    }
+
+    public function toggleCoupon(int $id)
+    {
+        $coupon = Coupon::findOrFail($id);
+        $coupon->update(['is_active' => !$coupon->is_active]);
+
+        return back()->with('success', 'Status kupon promo berhasil diperbarui.');
+    }
+
+    public function deleteCoupon(int $id)
+    {
+        $coupon = Coupon::findOrFail($id);
+        $coupon->delete();
+
+        return back()->with('success', 'Kupon promo berhasil dihapus.');
     }
 
     public function updateSettings(Request $request)

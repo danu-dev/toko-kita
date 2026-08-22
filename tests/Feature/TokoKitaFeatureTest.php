@@ -331,5 +331,31 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertSee('Status Operasional');
         $response->assertSee('Buka Sekarang');
     }
+
+    public function test_admin_can_manage_coupons()
+    {
+        $admin = User::where('email', 'admin@tokokita.id')->first();
+        $this->actingAs($admin);
+
+        $code = 'TEST' . rand(1000, 9999);
+        $createRes = $this->post(route('admin.coupons.store'), [
+            'code' => $code,
+            'title' => 'Diskon Pengguna Baru',
+            'type' => 'fixed',
+            'discount_value' => 15000,
+            'min_order_amount' => 40000,
+        ]);
+        $createRes->assertRedirect();
+        $this->assertDatabaseHas('coupons', ['code' => $code]);
+
+        $coupon = Coupon::where('code', $code)->first();
+        $toggleRes = $this->post(route('admin.coupons.toggle', $coupon->id));
+        $toggleRes->assertRedirect();
+        $this->assertFalse($coupon->fresh()->is_active);
+
+        $deleteRes = $this->delete(route('admin.coupons.delete', $coupon->id));
+        $deleteRes->assertRedirect();
+        $this->assertDatabaseMissing('coupons', ['id' => $coupon->id]);
+    }
 }
 

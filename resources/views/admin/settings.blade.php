@@ -116,5 +116,126 @@
 
     </div>
 
+    <!-- Voucher & Promo Coupon Management (PRD Section 5.3) -->
+    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6" x-data="{ type: 'fixed' }">
+        <div>
+            <h3 class="font-display font-bold text-base text-[#0B5A45]">Kupon & Voucher Promo Platform</h3>
+            <p class="text-xs text-gray-400">Terbitkan kode promo potongan harga nominal (Rp) atau persentase (%) untuk mendorong transaksi pembeli.</p>
+        </div>
+
+        <!-- Add Coupon Form -->
+        <form action="{{ route('admin.coupons.store') }}" method="POST" class="p-5 bg-[#FAF8F2] rounded-3xl border border-gray-200/80 space-y-4 text-xs">
+            @csrf
+            
+            <h4 class="font-bold text-[#0B5A45] uppercase text-[11px] flex items-center gap-1.5">
+                <i data-lucide="ticket" class="w-4 h-4"></i>
+                <span>Buat Kupon Promo Baru</span>
+            </h4>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-gray-700 font-bold mb-1">Kode Voucher</label>
+                    <input type="text" name="code" required placeholder="MISAL: LEBARAN2026" class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-xl font-mono uppercase font-bold text-[#0B5A45]">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-bold mb-1">Judul / Deskripsi Singkat</label>
+                    <input type="text" name="title" required placeholder="Diskon Spesial Pengguna Baru" class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-bold mb-1">Tipe Diskon</label>
+                    <select name="type" x-model="type" class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-xl font-semibold">
+                        <option value="fixed">Nominal Tetap (Rp)</option>
+                        <option value="percent">Persentase (%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-gray-700 font-bold mb-1">
+                        <span x-text="type === 'fixed' ? 'Besar Potongan (Rp)' : 'Besar Potongan (%)'">Besar Potongan</span>
+                    </label>
+                    <input type="number" name="discount_value" required min="1" placeholder="10000" class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-xl font-mono">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-bold mb-1">Min. Belanja (Rp)</label>
+                    <input type="number" name="min_order_amount" required min="0" value="0" placeholder="30000" class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-xl font-mono">
+                </div>
+                <div x-show="type === 'percent'">
+                    <label class="block text-gray-700 font-bold mb-1">Maks. Diskon (Rp - Opsional)</label>
+                    <input type="number" name="max_discount" placeholder="25000" class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-xl font-mono">
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="bg-[#0B5A45] hover:bg-[#084233] text-white font-bold px-6 py-2 rounded-xl text-xs flex items-center gap-1.5 transition">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Terbitkan Kupon</span>
+                </button>
+            </div>
+        </form>
+
+        <!-- Coupons Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="border-b border-gray-100 text-gray-400 uppercase text-[10px] text-left">
+                        <th class="py-2.5 font-bold">Kode</th>
+                        <th class="py-2.5 font-bold">Judul Promo</th>
+                        <th class="py-2.5 font-bold">Diskon</th>
+                        <th class="py-2.5 font-bold">Min. Belanja</th>
+                        <th class="py-2.5 text-center font-bold">Status</th>
+                        <th class="py-2.5 text-right font-bold">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($coupons as $cp)
+                        <tr class="hover:bg-[#FAF8F2]/60 transition">
+                            <td class="py-3 font-mono font-bold text-[#0B5A45]">{{ $cp->code }}</td>
+                            <td class="py-3 font-semibold text-gray-800">{{ $cp->title }}</td>
+                            <td class="py-3 font-mono">
+                                @if($cp->type === 'percent')
+                                    <span class="font-bold text-[#F2A93B]">{{ (int)$cp->discount_value }}%</span>
+                                    @if($cp->max_discount)
+                                        <span class="text-gray-400 text-[10px] block">Maks Rp {{ number_format($cp->max_discount, 0, ',', '.') }}</span>
+                                    @endif
+                                @else
+                                    <span class="font-bold text-[#0E9F6E]">Rp {{ number_format($cp->discount_value, 0, ',', '.') }}</span>
+                                @endif
+                            </td>
+                            <td class="py-3 font-mono text-gray-600">Rp {{ number_format($cp->min_order_amount, 0, ',', '.') }}</td>
+                            <td class="py-3 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $cp->is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-500' }}">
+                                    {{ $cp->is_active ? 'Aktif' : 'Non-aktif' }}
+                                </span>
+                            </td>
+                            <td class="py-3 text-right">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <form action="{{ route('admin.coupons.toggle', $cp->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="px-2.5 py-1 rounded-lg border border-gray-200 hover:bg-gray-100 text-[10px] font-bold text-gray-700 transition">
+                                            {{ $cp->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.coupons.delete', $cp->id) }}" method="POST" onsubmit="return confirm('Hapus kupon ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="p-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="py-6 text-center text-gray-400">Belum ada kupon voucher yang dibuat.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 @endsection

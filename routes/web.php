@@ -109,4 +109,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/pengaturan', [AdminController::class, 'updateSettings'])->name('settings.update');
     Route::post('/banner', [AdminController::class, 'storeBanner'])->name('banners.store');
     Route::delete('/banner/{id}', [AdminController::class, 'deleteBanner'])->name('banners.delete');
+    Route::post('/kupon', [AdminController::class, 'storeCoupon'])->name('coupons.store');
+    Route::post('/kupon/{id}/toggle', [AdminController::class, 'toggleCoupon'])->name('coupons.toggle');
+    Route::delete('/kupon/{id}', [AdminController::class, 'deleteCoupon'])->name('coupons.delete');
 });
