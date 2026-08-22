@@ -17,7 +17,7 @@ foreach ($dirs as $dir) {
     }
 }
 
-// Ensure database sqlite exists in /tmp
+// Copy sqlite database to /tmp
 $sourceDb = __DIR__ . '/../database/database.sqlite';
 $targetDb = '/tmp/database.sqlite';
 
@@ -31,22 +31,27 @@ if (!file_exists($targetDb)) {
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Bootstrap Laravel
 $app = require __DIR__ . '/../bootstrap/app.php';
 
-// Override storage and bootstrap paths before running
 $app->useStoragePath('/tmp');
 $app->useBootstrapPath('/tmp');
 
-// Check if database tables exist, otherwise run migrations & seeders automatically
-if (!file_exists('/tmp/.migrated')) {
-    try {
-        \Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
-            '--force' => true,
-            '--seed' => true,
-        ]);
-        @touch('/tmp/.migrated');
-    } catch (\Throwable $e) {}
-}
+// Create request and handle with catch block that exposes the actual error
+$request = Request::capture();
 
-$app->handleRequest(Request::capture());
+try {
+    $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
+    $response = $kernel->handle($request);
+    $response->send();
+    $kernel->terminate($request, $response);
+} catch (\Throwable $e) {
+    header('HTTP/1.1 200 OK', true, 200);
+    header('Content-Type: text/html');
+    echo '<div style="background:#111;color:#ff5555;padding:30px;font-family:monospace;white-space:pre-wrap;font-size:14px;">';
+    echo "<h1>LARAVEL VERCEL ERROR INSPECTION</h1>\n\n";
+    echo "<b>EXCEPTION:</b> " . get_class($e) . "\n";
+    echo "<b>MESSAGE:</b> " . $e->getMessage() . "\n";
+    echo "<b>FILE:</b> " . $e->getFile() . " : line " . $e->getLine() . "\n\n";
+    echo "<b>STACK TRACE:</b>\n" . $e->getTraceAsString();
+    echo '</div>';
+}
