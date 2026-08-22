@@ -15,7 +15,103 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="bg-[#FAF8F2] text-[#1E2723] min-h-screen flex antialiased">
+<body class="bg-[#FAF8F2] text-[#1E2723] min-h-screen flex flex-col md:flex-row antialiased pb-16 md:pb-0" x-data="{ mobileMenuOpen: false }">
+
+    <!-- Mobile Top Navigation Header for Seller -->
+    <div class="md:hidden bg-[#0B5A45] text-white px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+        <div class="flex items-center gap-2">
+            <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white">
+                <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+            <a href="{{ route('seller.dashboard') }}" class="font-display font-black text-lg text-white">
+                Toko<span class="text-[#0E9F6E]">Kita</span><span class="text-[#F2A93B]">.</span>
+                <span class="text-[10px] text-emerald-200 uppercase tracking-wider font-semibold ml-1">Mitra</span>
+            </a>
+        </div>
+        <div class="flex items-center gap-2">
+            @if(Auth::user()->store)
+                <span class="w-2 h-2 rounded-full {{ Auth::user()->store->is_open ? 'bg-[#0E9F6E] animate-pulse' : 'bg-red-500' }}"></span>
+                <span class="text-[11px] font-bold text-emerald-100">{{ Auth::user()->store->is_open ? 'Buka' : 'Tutup' }}</span>
+            @endif
+        </div>
+    </div>
+
+    <!-- Mobile Drawer / Offcanvas for Seller -->
+    <div x-show="mobileMenuOpen" x-cloak class="fixed inset-0 z-50 md:hidden flex" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs" @click="mobileMenuOpen = false"></div>
+        <div class="relative flex-1 flex flex-col max-w-xs w-full bg-[#0B5A45] text-white p-4 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-emerald-900/60">
+                <div>
+                    <span class="font-display font-black text-xl text-white">Toko<span class="text-[#0E9F6E]">Kita</span><span class="text-[#F2A93B]">.</span></span>
+                    <span class="block text-[10px] text-emerald-200 uppercase tracking-wider font-semibold">Menu Mitra Toko</span>
+                </div>
+                <button type="button" @click="mobileMenuOpen = false" class="p-1.5 rounded-xl hover:bg-white/10 text-emerald-200">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <nav class="space-y-1.5 text-xs font-semibold overflow-y-auto flex-1">
+                <a href="{{ route('seller.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ request()->routeIs('seller.dashboard') ? 'bg-[#0E9F6E] text-white shadow-md' : 'text-emerald-100/80 hover:bg-white/10 hover:text-white' }}">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Ringkasan Toko</span>
+                </a>
+
+                <a href="{{ route('seller.orders') }}" class="flex items-center justify-between px-4 py-3 rounded-2xl transition {{ request()->routeIs('seller.orders*') ? 'bg-[#0E9F6E] text-white shadow-md' : 'text-emerald-100/80 hover:bg-white/10 hover:text-white' }}">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="receipt" class="w-4 h-4"></i>
+                        <span>Kelola Pesanan</span>
+                    </div>
+                    @php
+                        $pendingOrdersCountDrawer = \App\Models\Order::where('store_id', Auth::user()->store?->id)->where('status', 'menunggu_konfirmasi')->count();
+                    @endphp
+                    @if($pendingOrdersCountDrawer > 0)
+                        <span class="bg-[#F2A93B] text-[#1E2723] text-[10px] font-black px-2 py-0.5 rounded-full">
+                            {{ $pendingOrdersCountDrawer }}
+                        </span>
+                    @endif
+                </a>
+
+                <a href="{{ route('seller.products') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ request()->routeIs('seller.products*') ? 'bg-[#0E9F6E] text-white shadow-md' : 'text-emerald-100/80 hover:bg-white/10 hover:text-white' }}">
+                    <i data-lucide="package" class="w-4 h-4"></i>
+                    <span>Katalog Produk</span>
+                </a>
+
+                <a href="{{ route('seller.wallet') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ request()->routeIs('seller.wallet*') ? 'bg-[#0E9F6E] text-white shadow-md' : 'text-emerald-100/80 hover:bg-white/10 hover:text-white' }}">
+                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                    <span>Saldo & Penarikan</span>
+                </a>
+
+                <a href="{{ route('seller.reports') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ request()->routeIs('seller.reports*') ? 'bg-[#0E9F6E] text-white shadow-md' : 'text-emerald-100/80 hover:bg-white/10 hover:text-white' }}">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                    <span>Laporan & Ulasan</span>
+                </a>
+
+                <a href="{{ route('chats.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ request()->routeIs('chats*') ? 'bg-[#0E9F6E] text-white shadow-md' : 'text-emerald-100/80 hover:bg-white/10 hover:text-white' }}">
+                    <i data-lucide="message-square" class="w-4 h-4"></i>
+                    <span>Pesan Pelanggan</span>
+                </a>
+
+                <a href="{{ route('seller.settings') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl transition {{ request()->routeIs('seller.settings*') ? 'bg-[#0E9F6E] text-white shadow-md' : 'text-emerald-100/80 hover:bg-white/10 hover:text-white' }}">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Pengaturan Toko</span>
+                </a>
+            </nav>
+
+            <div class="pt-3 border-t border-emerald-900/60 space-y-2 text-xs">
+                <a href="{{ route('home') }}" class="flex items-center gap-2 text-emerald-200 hover:text-white py-2 px-3 rounded-xl hover:bg-white/5 transition">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Kembali ke TokoKita.</span>
+                </a>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center gap-2 text-red-300 hover:text-red-100 py-2 px-3 rounded-xl hover:bg-white/5 transition">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Keluar Akun</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Fixed Left Sidebar -->
     <aside class="w-64 bg-[#0B5A45] text-white flex-col justify-between hidden md:flex shrink-0 min-h-screen sticky top-0">
@@ -146,10 +242,44 @@
             @endif
         </div>
 
-        <main class="p-6 flex-1">
+        <main class="p-4 sm:p-6 flex-1">
             @yield('content')
         </main>
     </div>
+
+    <!-- Mobile Bottom Navigation for Seller Portal -->
+    <aside class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-40 px-2 py-1.5 shadow-lg">
+        <div class="grid grid-cols-5 items-center">
+            <a href="{{ route('seller.dashboard') }}" class="flex flex-col items-center justify-center py-1 {{ request()->routeIs('seller.dashboard') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Ringkasan</span>
+            </a>
+            <a href="{{ route('seller.orders') }}" class="flex flex-col items-center justify-center py-1 relative {{ request()->routeIs('seller.orders*') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
+                <div class="relative">
+                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                    @php $botCount = \App\Models\Order::where('store_id', Auth::user()->store?->id)->where('status', 'menunggu_konfirmasi')->count(); @endphp
+                    @if($botCount > 0)
+                        <span class="absolute -top-1.5 -right-2 bg-[#F2A93B] text-[#1E2723] text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center shadow-xs">
+                            {{ $botCount }}
+                        </span>
+                    @endif
+                </div>
+                <span class="text-[10px] font-semibold mt-0.5">Pesanan</span>
+            </a>
+            <a href="{{ route('seller.products') }}" class="flex flex-col items-center justify-center py-1 {{ request()->routeIs('seller.products*') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Produk</span>
+            </a>
+            <a href="{{ route('seller.wallet') }}" class="flex flex-col items-center justify-center py-1 {{ request()->routeIs('seller.wallet*') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
+                <i data-lucide="wallet" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Saldo</span>
+            </a>
+            <a href="{{ route('seller.settings') }}" class="flex flex-col items-center justify-center py-1 {{ request()->routeIs('seller.settings*') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Toko</span>
+            </a>
+        </div>
+    </aside>
 
     @livewireScripts
     <script>
