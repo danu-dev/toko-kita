@@ -614,6 +614,29 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
     }
+
+    public function test_buyer_can_file_dispute_and_admin_resolves()
+    {
+        $buyer = User::where('email', 'buyer@tokokita.id')->first();
+        $this->actingAs($buyer);
+
+        $order = Order::where('buyer_id', $buyer->id)->first();
+        
+        $response = $this->post(route('orders.dispute', $order->id), [
+            'reason' => 'Makanan tumpah atau basi',
+            'description' => 'Mohon bantuan refund karena kemasan rusak.',
+        ]);
+
+        $response->assertRedirect();
+
+        // Admin resolution
+        $admin = User::where('email', 'admin@tokokita.id')->first();
+        $this->actingAs($admin);
+
+        $disputesRes = $this->get(route('admin.disputes'));
+        $disputesRes->assertStatus(200);
+        $disputesRes->assertSee('Pusat Resolusi Dispute', false);
+    }
 }
 
 
