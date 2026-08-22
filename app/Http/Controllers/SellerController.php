@@ -119,15 +119,39 @@ class SellerController extends Controller
     }
 
     // PRODUCTS (Supports Local File Upload OR Image URL)
-    public function products()
+    public function products(Request $request)
     {
         $store = $this->getStore();
-        $products = Product::with(['category', 'variants'])
-            ->where('store_id', $store->id)
-            ->latest()
-            ->paginate(12);
+        $query = $request->input('q');
+        $categoryId = $request->input('category');
+        $status = $request->input('status'); // 'active', 'inactive', 'out_of_stock'
 
-        return view('seller.products.index', compact('store', 'products'));
+        $products = Product::with(['category', 'variants'])
+            ->where('store_id', $store->id);
+
+        if ($query) {
+            $products->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('description', 'like', "%{$query}%");
+            });
+        }
+
+        if ($categoryId) {
+            $products->where('category_id', $categoryId);
+        }
+
+        if ($status === 'active') {
+            $products->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $products->where('is_active', false);
+        } elseif ($status === 'out_of_stock') {
+            $products->where('stock', '<=', 0);
+        }
+
+        $products = $products->latest()->paginate(12)->withQueryString();
+        $categories = Category::where('is_active', true)->get();
+
+        return view('seller.products.index', compact('store', 'products', 'categories', 'query', 'categoryId', 'status'));
     }
 
     public function createProduct()

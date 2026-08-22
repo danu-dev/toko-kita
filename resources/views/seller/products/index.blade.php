@@ -5,7 +5,7 @@
 @section('content')
 <div class="space-y-6">
 
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="font-display font-black text-2xl text-[#0B5A45]">Katalog Produk & Menu</h1>
             <p class="text-xs text-gray-500">Kelola daftar menu, varian harga, dan ketersediaan stok tokomu.</p>
@@ -15,6 +15,40 @@
             <i data-lucide="plus" class="w-4 h-4"></i>
             <span>Tambah Produk Baru</span>
         </a>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
+        <form action="{{ route('seller.products') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3 text-xs">
+            <div class="flex-1 w-full relative">
+                <input type="text" name="q" value="{{ $query }}" placeholder="Cari nama menu / produk..." class="w-full pl-9 pr-4 py-2 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs focus:border-[#0E9F6E] focus:outline-none">
+                <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-2.5"></i>
+            </div>
+
+            <select name="category" class="w-full sm:w-auto px-3 py-2 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs focus:border-[#0E9F6E] focus:outline-none">
+                <option value="">Semua Kategori</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat->id }}" {{ $categoryId == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                @endforeach
+            </select>
+
+            <select name="status" class="w-full sm:w-auto px-3 py-2 bg-[#FAF8F2] border border-gray-200 rounded-xl text-xs focus:border-[#0E9F6E] focus:outline-none">
+                <option value="">Semua Status</option>
+                <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Aktif Dijual</option>
+                <option value="inactive" {{ $status === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
+                <option value="out_of_stock" {{ $status === 'out_of_stock' ? 'selected' : '' }}>Stok Habis (0)</option>
+            </select>
+
+            <button type="submit" class="w-full sm:w-auto bg-[#0E9F6E] hover:bg-[#086644] text-white px-4 py-2 rounded-xl font-bold transition">
+                Filter
+            </button>
+
+            @if($query || $categoryId || $status)
+                <a href="{{ route('seller.products') }}" class="text-red-500 hover:underline font-bold px-2 py-1">
+                    Reset
+                </a>
+            @endif
+        </form>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

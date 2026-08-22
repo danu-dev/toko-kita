@@ -540,6 +540,22 @@ class TokoKitaFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertDontSee($closedProduct->name);
     }
+
+    public function test_seller_can_filter_and_search_products_catalog()
+    {
+        $seller = User::where('email', 'seller@tokokita.id')->first();
+        $this->actingAs($seller);
+
+        // Search by keyword
+        $searchRes = $this->get(route('seller.products', ['q' => 'Rawon']));
+        $searchRes->assertStatus(200);
+        $searchRes->assertSee('Rawon Daging Sapi Spesial');
+
+        // Filter by active status
+        $statusRes = $this->get(route('seller.products', ['status' => 'active']));
+        $statusRes->assertStatus(200);
+        $statusRes->assertViewHas('status', 'active');
+    }
 }
 
 
