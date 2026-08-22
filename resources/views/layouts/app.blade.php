@@ -240,9 +240,9 @@
         @yield('content')
     </main>
 
-    <!-- Mobile Bottom Navigation -->
+    <!-- Mobile Bottom Navigation (5 Action Items with Cart Badge) -->
     <aside class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-50 px-2 py-1.5 shadow-lg">
-        <div class="grid grid-cols-4 items-center">
+        <div class="grid grid-cols-5 items-center">
             <a href="{{ route('home') }}" class="flex flex-col items-center justify-center py-1 {{ request()->routeIs('home') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
                 @if(request()->routeIs('home'))
                     <span class="w-5 h-1 bg-[#0E9F6E] rounded-full mb-1"></span>
@@ -251,20 +251,38 @@
                 <span class="text-[10px] font-semibold mt-0.5">Beranda</span>
             </a>
 
+            <a href="{{ route('explore') }}" class="flex flex-col items-center justify-center py-1 {{ request()->routeIs('explore') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
+                @if(request()->routeIs('explore'))
+                    <span class="w-5 h-1 bg-[#0E9F6E] rounded-full mb-1"></span>
+                @endif
+                <i data-lucide="compass" class="w-5 h-5"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Jelajah</span>
+            </a>
+
+            <a href="{{ route('cart') }}" class="flex flex-col items-center justify-center py-1 relative {{ request()->routeIs('cart') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
+                @if(request()->routeIs('cart'))
+                    <span class="w-5 h-1 bg-[#0E9F6E] rounded-full mb-1"></span>
+                @endif
+                <div class="relative">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    @php
+                        $mobileCartCount = Auth::check() ? \App\Models\CartItem::whereHas('cart', fn($q) => $q->where('user_id', Auth::id()))->sum('quantity') : 0;
+                    @endphp
+                    @if($mobileCartCount > 0)
+                        <span class="absolute -top-1.5 -right-2 bg-[#F2A93B] text-[#1E2723] text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center shadow-xs">
+                            {{ $mobileCartCount }}
+                        </span>
+                    @endif
+                </div>
+                <span class="text-[10px] font-semibold mt-0.5">Keranjang</span>
+            </a>
+
             <a href="{{ route('orders.index') }}" class="flex flex-col items-center justify-center py-1 relative {{ request()->routeIs('orders.*') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
                 @if(request()->routeIs('orders.*'))
                     <span class="w-5 h-1 bg-[#0E9F6E] rounded-full mb-1"></span>
                 @endif
                 <i data-lucide="receipt" class="w-5 h-5"></i>
                 <span class="text-[10px] font-semibold mt-0.5">Pesanan</span>
-            </a>
-
-            <a href="{{ route('chats.index') }}" class="flex flex-col items-center justify-center py-1 {{ request()->routeIs('chats.*') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
-                @if(request()->routeIs('chats.*'))
-                    <span class="w-5 h-1 bg-[#0E9F6E] rounded-full mb-1"></span>
-                @endif
-                <i data-lucide="message-circle" class="w-5 h-5"></i>
-                <span class="text-[10px] font-semibold mt-0.5">Chat</span>
             </a>
 
             <a href="{{ route('profile') }}" class="flex flex-col items-center justify-center py-1 {{ request()->routeIs('profile') ? 'text-[#0E9F6E]' : 'text-gray-500 hover:text-gray-800' }}">
