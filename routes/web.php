@@ -50,6 +50,7 @@ Route::middleware(['auth'])->group(function () {
     // Wishlist & Profile
     Route::get('/wishlist', [BuyerController::class, 'wishlist'])->name('wishlist');
     Route::post('/wishlist/toggle/{productId}', [BuyerController::class, 'toggleWishlist'])->name('wishlist.toggle');
+    Route::post('/toko/{storeId}/favorit', [BuyerController::class, 'toggleFavoriteStore'])->name('stores.favorite.toggle');
     Route::get('/profil', [BuyerController::class, 'profile'])->name('profile');
     Route::post('/profil', [BuyerController::class, 'updateProfile'])->name('profile.update');
     Route::post('/alamat', [BuyerController::class, 'storeAddress'])->name('addresses.store');

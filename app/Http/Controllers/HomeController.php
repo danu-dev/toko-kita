@@ -8,6 +8,7 @@ use App\Models\Store;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\Wishlist;
+use App\Models\FavoriteStore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -133,7 +134,16 @@ class HomeController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        return view('store-show', compact('store'));
+        $isFavorited = false;
+        if (Auth::check()) {
+            $isFavorited = FavoriteStore::where('user_id', Auth::id())
+                ->where('store_id', $store->id)
+                ->exists();
+        }
+
+        $totalFollowers = FavoriteStore::where('store_id', $store->id)->count();
+
+        return view('store-show', compact('store', 'isFavorited', 'totalFollowers'));
     }
 
     public function productShow(string $slug)

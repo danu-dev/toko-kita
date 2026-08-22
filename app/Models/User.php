@@ -88,4 +88,9 @@ class User extends Authenticatable
     {
         return $this->hasRole('admin');
     }
+
+    public function favoriteStores()
+    {
+        return $this->hasMany(FavoriteStore::class);
+    }
 }

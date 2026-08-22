@@ -74,4 +74,9 @@ class Store extends Model
     {
         return $this->hasMany(Dispute::class);
     }
+
+    public function favorites()
+    {
+        return $this->hasMany(FavoriteStore::class);
+    }
 }

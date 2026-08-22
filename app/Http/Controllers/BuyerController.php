@@ -11,6 +11,7 @@ use App\Models\ProductVariant;
 use App\Models\Address;
 use App\Models\Store;
 use App\Models\Wishlist;
+use App\Models\FavoriteStore;
 use App\Models\Review;
 use App\Models\Dispute;
 use App\Models\Coupon;
@@ -403,7 +404,7 @@ class BuyerController extends Controller
         return back()->with('success', 'Komplain berhasil diajukan. Tim admin & penjual akan segera merespon.');
     }
 
-    // WISHLIST
+    // WISHLIST & FAVORITES
     public function wishlist()
     {
         $wishlists = Wishlist::with('product.store')
@@ -411,7 +412,12 @@ class BuyerController extends Controller
             ->latest()
             ->get();
 
-        return view('buyer.wishlist', compact('wishlists'));
+        $favoriteStores = FavoriteStore::with('store.category')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+
+        return view('buyer.wishlist', compact('wishlists', 'favoriteStores'));
     }
 
     public function toggleWishlist(Request $request, int $productId)
@@ -425,6 +431,37 @@ class BuyerController extends Controller
         } else {
             Wishlist::create(['user_id' => $user->id, 'product_id' => $productId]);
             $msg = 'Ditambahkan ke wishlist!';
+        }
+
+        return back()->with('success', $msg);
+    }
+
+    public function toggleFavoriteStore(Request $request, int $storeId)
+    {
+        $user = Auth::user();
+        $store = Store::findOrFail($storeId);
+
+        $exists = FavoriteStore::where('user_id', $user->id)->where('store_id', $store->id)->first();
+
+        if ($exists) {
+            $exists->delete();
+            $isFavorited = false;
+            $msg = "Toko '{$store->name}' dihapus dari toko favorit.";
+        } else {
+            FavoriteStore::create([
+                'user_id' => $user->id,
+                'store_id' => $store->id,
+            ]);
+            $isFavorited = true;
+            $msg = "Toko '{$store->name}' berhasil ditambahkan ke toko favorit!";
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'is_favorited' => $isFavorited,
+                'message' => $msg,
+            ]);
         }
 
         return back()->with('success', $msg);

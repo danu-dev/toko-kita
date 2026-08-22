@@ -28,6 +28,17 @@
                 <div class="flex items-center gap-2 w-full sm:w-auto">
                     @auth
                         @if(!Auth::user()->store || Auth::user()->store->id !== $store->id)
+                            <form action="{{ route('stores.favorite.toggle', $store->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-4 py-2.5 rounded-2xl font-bold text-xs border flex items-center gap-1.5 transition {{ $isFavorited ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100' : 'bg-[#FAF8F2] border-gray-200 text-gray-700 hover:text-rose-600 hover:border-rose-200' }}">
+                                    <i data-lucide="heart" class="w-4 h-4 {{ $isFavorited ? 'fill-current text-rose-500' : '' }}"></i>
+                                    <span>{{ $isFavorited ? 'Mengikuti' : 'Favoritkan' }}</span>
+                                    @if($totalFollowers > 0)
+                                        <span class="ml-0.5 text-[11px] opacity-80">({{ $totalFollowers }})</span>
+                                    @endif
+                                </button>
+                            </form>
+
                             <form action="{{ route('chats.start') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="store_id" value="{{ $store->id }}">
@@ -37,6 +48,14 @@
                                 </button>
                             </form>
                         @endif
+                    @else
+                        <a href="{{ route('login') }}" class="bg-[#FAF8F2] hover:bg-rose-50 text-gray-700 hover:text-rose-600 px-4 py-2.5 rounded-2xl font-bold text-xs border border-gray-200 flex items-center gap-1.5 transition">
+                            <i data-lucide="heart" class="w-4 h-4"></i>
+                            <span>Favoritkan</span>
+                            @if($totalFollowers > 0)
+                                <span class="ml-0.5 text-[11px] opacity-80">({{ $totalFollowers }})</span>
+                            @endif
+                        </a>
                     @endauth
                 </div>
             </div>

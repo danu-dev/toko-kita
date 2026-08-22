@@ -251,4 +251,34 @@ class TokoKitaFeatureTest extends TestCase
         $approveRes->assertRedirect();
         $this->assertEquals('approved', $pendingStore->fresh()->status);
     }
+
+    public function test_buyer_can_favorite_and_unfavorite_store()
+    {
+        $buyer = User::where('email', 'buyer@tokokita.id')->first();
+        $store = Store::where('slug', 'warung-nasi-bu-siti')->first();
+
+        $this->actingAs($buyer);
+
+        // Toggle Favorite: Add
+        $res = $this->post(route('stores.favorite.toggle', $store->id));
+        $res->assertRedirect();
+        $this->assertDatabaseHas('favorite_stores', [
+            'user_id' => $buyer->id,
+            'store_id' => $store->id,
+        ]);
+
+        // Verify on wishlist page
+        $wishlistRes = $this->get(route('wishlist'));
+        $wishlistRes->assertStatus(200);
+        $wishlistRes->assertSee($store->name);
+
+        // Toggle Favorite: Remove
+        $unfavRes = $this->post(route('stores.favorite.toggle', $store->id));
+        $unfavRes->assertRedirect();
+        $this->assertDatabaseMissing('favorite_stores', [
+            'user_id' => $buyer->id,
+            'store_id' => $store->id,
+        ]);
+    }
 }
+
